@@ -1,0 +1,3 @@
+class MongoDB implements MongoDBInterface {
+
+}
