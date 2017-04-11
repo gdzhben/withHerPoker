@@ -85,7 +85,7 @@ export class Hand implements IHand {
 
     // CHANGE THIS ONCE TOSTRING() HAS BEEN ADDED TO CARD CLASS!
     public toString(): string {
-        let str: string = "";
+        let str = "";
 
         for (let card of this._cards) {
             str += card.toString();

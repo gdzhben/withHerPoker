@@ -37,7 +37,7 @@ export class Card implements ICard {
     }
 
     public toString(): string {
-        let str: string = this.getCardName() + this.getSuitTypeString();
+        let str = this.getCardName() + this.getSuitTypeString();
         return str;
     }
 
