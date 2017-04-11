@@ -32,4 +32,36 @@ describe('Test', function() {
         });
     });
 
+    describe('getCard', () => {
+        it ('it must return \'5D\'', () => {
+            let result = testHand.getCard(3);
+            expect(result.toString()).toBe("5D");
+        });
+    });
+
+    describe('discard', () => {
+        it ('it must return \'5D\'', () => {
+            let result = testHand.discard(3);
+            expect(result.toString()).toBe("5D");
+            expect(testHand.size()).toBe(4);
+        });
+    });
+
+    describe('receiveCard', () => {
+        it ('it must return NOTHING, but hand should contain the new card', () => {
+            testHand.discard(3);
+            let newCard: Card = new Card("9", SuitType.HEARTS, 9);
+            testHand.receiveCard(newCard);
+            expect(testHand.getCard(4).toString()).toBe("9H");
+        });
+    });
+
+    describe('discardCount', () => {
+        it ('it must return 2', () => {
+            testHand.discard(3);
+            testHand.discard(1);
+            expect(testHand.getDiscardedCount()).toBe(2);
+        });
+    });
+
 });

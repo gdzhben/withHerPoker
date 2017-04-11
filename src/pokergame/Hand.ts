@@ -87,8 +87,7 @@ export class Hand implements IHand {
         let str: string = "";
 
         for (let card of this._cards) {
-            str += card.getCardName();
-            str += card.getSuitTypeString();
+            str += card.toString();
             str += " ";
         }
 
