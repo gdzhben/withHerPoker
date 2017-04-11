@@ -1,5 +1,6 @@
 import { Card } from './Card';
 import { Hand } from './Hand';
+import { HandType } from '../types/HandType';
 import { IHandClassifier } from './IHandClassifier';
 
 export class HandClassifier implements IHandClassifier {
