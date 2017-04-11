@@ -2,7 +2,7 @@ import { Hand } from "./Hand";
 import { Card } from './Card';
 import { SuitType } from '../types/SuitType';
 
-describe('Test', function() {
+describe('Hand', function() {
 
     let testHand: Hand;
     let testCardArray: Card[];
@@ -28,21 +28,21 @@ describe('Test', function() {
         it ('it must sort the hand', () => {
             testHand.sort();
             let result = testHand.toString();
-            expect(result).toBe("AC KC 5D 5D 3H ");
+            expect(result).toBe("3Hearts 5Diamonds 5Diamonds KClubs AClubs ");
         });
     });
 
     describe('getCard', () => {
-        it ('it must return \'5D\'', () => {
-            let result = testHand.getCard(3);
-            expect(result.toString()).toBe("5D");
+        it ('it must return \'5Diamonds\'', () => {
+            let result = testHand.getCard(2);
+            expect(result.toString()).toBe("5Diamonds");
         });
     });
 
     describe('discard', () => {
-        it ('it must return \'5D\'', () => {
-            let result = testHand.discard(3);
-            expect(result.toString()).toBe("5D");
+        it ('it must return \'5Diamonds\'', () => {
+            let result = testHand.discard(2);
+            expect(result.toString()).toBe("5Diamonds");
             expect(testHand.size()).toBe(4);
         });
     });
@@ -50,9 +50,9 @@ describe('Test', function() {
     describe('receiveCard', () => {
         it ('it must return NOTHING, but hand should contain the new card', () => {
             testHand.discard(3);
-            let newCard: Card = new Card("9", SuitType.HEARTS, 9);
+            let newCard: Card = new Card("4", SuitType.HEARTS, 4);
             testHand.receiveCard(newCard);
-            expect(testHand.getCard(4).toString()).toBe("9H");
+            expect(testHand.getCard(1).toString()).toBe("4Hearts");
         });
     });
 

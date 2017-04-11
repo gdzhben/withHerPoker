@@ -27,7 +27,7 @@ export class Hand implements IHand {
         if (index < 0 || index > this._size)
             throw new Error("Index out of bounds");
         else if (this._discardedCount >= 3)
-            throw new Error("3 cards have already been discarded");
+            throw new Error("A maximum of 3 cards can be discarded");
 
         let temp: Card = this._cards[index];
         this._cards.splice(index, 1);
@@ -44,6 +44,7 @@ export class Hand implements IHand {
         // 'push' appends to end of array.
         this._cards.push(newCard);
         this._size = this._cards.length;
+        this.sort();
     }
 
     // Sort the cards based on their Face Value.
@@ -52,7 +53,7 @@ export class Hand implements IHand {
             let swapped: boolean = false;
 
             for (let i = 0; i < this._size - 1; i++) {
-                if (this._cards[i].getFaceValue() < this._cards[i + 1].getFaceValue()) {
+                if (this._cards[i].getFaceValue() > this._cards[i + 1].getFaceValue()) {
                     let temp: Card = this._cards[i];
                     this._cards[i] = this._cards[i + 1];
                     this._cards[i + 1] = temp;

@@ -23,13 +23,13 @@ export class Card implements ICard {
 
     public getSuitTypeString(): string {
         if (this.suitType == SuitType.CLUBS) 
-            return "C";
+            return "Clubs";
         else if (this.suitType == SuitType.DIAMONDS) 
-            return "D";
+            return "Diamonds";
         else if (this.suitType == SuitType.HEARTS) 
-            return "H";
+            return "Hearts";
         else
-            return "S";
+            return "Spades";
     }
 
     public getFaceValue(): number {
