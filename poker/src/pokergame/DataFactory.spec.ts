@@ -1,6 +1,6 @@
 import { DeckFactory } from "./DeckFactory";
 import { ICard } from "./ICard";
-import { SuitType, HandType } from '../type.ts'
+import { SuitType, HandType } from '../type'
 import * as _ from 'lodash';
 
 describe('Test', function () {
