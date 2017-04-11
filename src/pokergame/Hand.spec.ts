@@ -13,7 +13,7 @@ describe('Hand', function() {
         testCardArray.push(new Card("3", SuitType.HEARTS, 3));
         testCardArray.push(new Card("5", SuitType.DIAMONDS, 5));
         testCardArray.push(new Card("5", SuitType.DIAMONDS, 5));
-        testCardArray.push(new Card("A", SuitType.CLUBS, 14));
+        testCardArray.push(new Card("K", SuitType.DIAMONDS, 13));
         testHand = new Hand(testCardArray);
     });
 
@@ -28,7 +28,7 @@ describe('Hand', function() {
         it ('it must sort the hand', () => {
             testHand.sort();
             let result = testHand.toString();
-            expect(result).toBe("3Hearts 5Diamonds 5Diamonds KClubs AClubs ");
+            expect(result).toBe("3Hearts 5Diamonds 5Diamonds KClubs KDiamonds ");
         });
     });
 
