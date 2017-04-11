@@ -4,7 +4,7 @@
   "description": "Twitter based implementation of pokergame",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test",
+    "test": "tsc && gulp test",
     "build": "gulp cleanjs && tsc"
   },
   "repository": {
@@ -29,11 +29,22 @@
     "gulp-jasmine-browser": "^1.7.1",
     "jasmine": "^2.5.3",
     "jscs": "^3.0.7",
+    "pre-git": "^3.14.0",
     "typescript": "2.1.6",
     "typings": "^2.1.0"
   },
   "dependencies": {
     "express": "^4.15.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "twitter-node-client": "0.0.6"
+  },
+  "config": {
+    "pre-git": {
+      "enabled": true,
+      "pre-push": [
+        "npm run build",
+        "gulp test"
+      ]
+    }
   }
 }
