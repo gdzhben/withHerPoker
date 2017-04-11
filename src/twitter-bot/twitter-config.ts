@@ -6,8 +6,8 @@ export interface TwitterConfig {
 }
 
 export const twitterConfig: TwitterConfig = {
-    consumerKey: "ujF32r149n8QKsRa4saHb7IKb",
-    consumerSecret: "jYeiNUCiygdHOaJ5wAo9TOVHTmbFQYd0SyA7N4Et16eSWETS5W",
-    accessToken: "734803373581606915-R6ntbf1SSO4ZnArqXM8yzRVaolVFs7G",
-    accessTokenSecret: "E8M3LVfNsHwEWTjqfalZC1Ldqw7wngAg0y6YvvrZmImMH"
+    consumerKey: "qEahgTpNQIlr08NFLMG8Iouta",
+    consumerSecret: "jlwjDmA6Bh2vUIfL58Na08BDzA2qRFUpjW3LWRtfhHaBL2pikN",
+    accessToken: "734803373581606915-ufF32KQziDMO2Bkhs1cTCkNYMiz0vOx",
+    accessTokenSecret: "t3l1ckXS3ponNReWe3XMCgkcugh2vzhz8X4Exo17XDesq"
 };
