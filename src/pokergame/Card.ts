@@ -13,16 +13,32 @@ export class Card implements ICard {
         this.faceValue = faceValue;
     }
 
-        public getCardName(): string {
-            return this.cardName;
-        }
+    public getCardName(): string {
+        return this.cardName;
+    }
 
-        public getSuitType(): SuitType {
-            return this.suitType;
-        }
+    public getSuitType(): SuitType {
+        return this.suitType;
+    }
 
-        public getFaceValue(): number {
-            return this.faceValue;
-        }
+    public getSuitTypeString(): string {
+        if (this.suitType == SuitType.CLUBS) 
+            return "Clubs";
+        else if (this.suitType == SuitType.DIAMONDS) 
+            return "Diamonds";
+        else if (this.suitType == SuitType.HEARTS) 
+            return "Hearts";
+        else
+            return "Spades";
+    }
+
+    public getFaceValue(): number {
+        return this.faceValue;
+    }
+
+    public toString(): string {
+        let str = this.getCardName() + this.getSuitTypeString();
+        return str;
+    }
 
 }
