@@ -31,7 +31,7 @@ describe('Deck', () => {
             expect(result).toBe(51);
         });
     });
-    describe('discardedcard list test ', () => {
+    describe('returnCard test ', () => {
 
         it('after discard a card the card that been discarded should be in deck again', () => {
             let card = test.drawCard();

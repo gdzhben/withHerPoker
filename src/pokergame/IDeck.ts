@@ -7,6 +7,5 @@ export interface IDeck {
     returnCard(Card: ICard): void;
     drawCard(): ICard;
     sizeOfDeck(): number;
-    returnCard(card: ICard): void;
     containCard(card: ICard): boolean;
 }
