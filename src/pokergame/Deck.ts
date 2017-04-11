@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 export class Deck implements IDeck {
 
     private _deckOfCards: ICard[] = [];
-    private _discardedCards: ICard[] = [];
     constructor(cards: ICard[]) {
         this._deckOfCards = cards;
     }
@@ -24,13 +23,15 @@ export class Deck implements IDeck {
         }
 
     }
-
-    public returnCard(card: ICard): void {
-        this._discardedCards.push(card);
+    public sizeOfDeck() {
+        return this._deckOfCards.length;
     }
-    public containCard(card: ICard, cards: ICard[]): boolean {
+    public returnCard(card: ICard): void {
+        this._deckOfCards.push(card);
+    }
+    public containCard(card: ICard): boolean {
         let isSameCard: boolean = false;
-        for (let cardInList of cards) {
+        for (let cardInList of this._deckOfCards) {
             if (cardInList.getFaceValue() == card.getFaceValue() && cardInList.getSuitType() == card.getSuitType()) {
                 isSameCard = true;
             }
@@ -38,16 +39,5 @@ export class Deck implements IDeck {
         }
         return isSameCard;
     }
-
-    public getDeckOfCards(): ICard[] {
-        return this._deckOfCards;
-    }
-
-    public getDiscardedCards(): ICard[] {
-        return this._discardedCards;
-    }
-
-
-
 
 }

@@ -16,28 +16,27 @@ describe('Deck', () => {
 
         it('after shuffle deck size should still be 52', () => {
             test.shuffle();
-            let result = test.getDeckOfCards().length;
+            let result = test.sizeOfDeck();
 
             expect(result).toBe(52);
         });
     });
 
-    describe('discard card', () => {
+    describe('drawCard', () => {
 
-        it('after discard a card the length of the discard array must be 1', () => {
+        it('after we draw a card the size of deck should be 51 instead of 52', () => {
             let card = test.drawCard();
-            test.returnCard(card);
-            let result = test.getDiscardedCards();
+            let result = test.sizeOfDeck();
 
-            expect(result.length).toBe(1);
+            expect(result).toBe(51);
         });
     });
     describe('discardedcard list test ', () => {
 
-        it('after discard a card the card that been discarded should be in the discarded list', () => {
+        it('after discard a card the card that been discarded should be in deck again', () => {
             let card = test.drawCard();
             test.returnCard(card);
-            let result = test.containCard(card, test.getDiscardedCards());
+            let result = test.containCard(card);
             expect(result).toBe(true);
         });
     });
