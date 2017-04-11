@@ -11,4 +11,6 @@ export interface IHand {
     getCard(index: number): Card;
 
     size(): number;
+
+    getDiscardedCount(): number;
 }

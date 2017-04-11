@@ -17,10 +17,18 @@ describe('Test', function() {
         testHand = new Hand(testCardArray);
     });
 
-    describe('size', function() {
-        it('it must return 5', () => {
+    describe('size', () => {
+        it('it must return 5', () => { 
             let result = testHand.size();
             expect(result).toBe(5);
+        });
+    });
+
+    describe('sort', () => {
+        it ('it must sort the hand', () => {
+            testHand.sort();
+            let result = testHand.toString();
+            expect(result).toBe("AC KC 5D 5D 3H ");
         });
     });
 

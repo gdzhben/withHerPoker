@@ -5,12 +5,14 @@ export class Hand implements IHand {
 
     private _size: number;
     private _cards: Card[];
+    private _discardedCount: number;
 
     constructor(cards: Card[]) {
         if (cards.length != 5)
             throw new Error("Expected array of size 5");
 
         this._cards = [];
+        this._discardedCount = 0;
 
         for (let i = 0; i < cards.length; i++) {
             this._cards[i] = cards[i];
@@ -20,8 +22,18 @@ export class Hand implements IHand {
         this.sort();
     }
 
+    // Remove the card at index from the hand.
     public discard(index: number): Card {
-        return null;
+        if (index < 0 || index > this._size)
+            throw new Error("Index out of bounds");
+        else if (this._discardedCount >= 3)
+            throw new Error("3 cards have already been discarded");
+
+        let temp: Card = this._cards[index];
+        this._cards.splice(index, 1);
+        this._size = this._cards.length;
+        this._discardedCount++;
+        return temp;
     }
 
     // Add a card to the hand if the hand is not full.
@@ -31,6 +43,7 @@ export class Hand implements IHand {
 
         // 'push' appends to end of array.
         this._cards.push(newCard);
+        this._size = this._cards.length;
     }
 
     // Sort the cards based on their Face Value.
@@ -64,13 +77,18 @@ export class Hand implements IHand {
         return this._size;
     }
 
+    // Get the number of cards that have been discarded from the hand.
+    public getDiscardedCount(): number {
+        return this._discardedCount;
+    }
+
     // CHANGE THIS ONCE TOSTRING() HAS BEEN ADDED TO CARD CLASS!
     public toString(): string {
         let str: string = "";
 
         for (let card of this._cards) {
-            str += card.getCardName;
-            str += card.getSuitType;
+            str += card.getCardName();
+            str += card.getSuitTypeString();
             str += " ";
         }
 

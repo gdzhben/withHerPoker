@@ -21,6 +21,17 @@ export class Card implements ICard {
             return this.suitType;
         }
 
+        public getSuitTypeString(): string {
+            if (this.suitType == SuitType.CLUBS) 
+                return "C";
+            else if (this.suitType == SuitType.DIAMONDS) 
+                return "D";
+            else if (this.suitType == SuitType.HEARTS) 
+                return "H";
+            else
+                return "S";
+        }
+
         public getFaceValue(): number {
             return this.faceValue;
         }
