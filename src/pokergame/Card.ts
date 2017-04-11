@@ -29,11 +29,11 @@ export class Card implements ICard {
     }
 
     public getSuitTypeString(): string {
-        if (this.suitType == SuitType.CLUBS) 
+        if (this._suitType == SuitType.CLUBS) 
             return "Clubs";
-        else if (this.suitType == SuitType.DIAMONDS) 
+        else if (this._suitType == SuitType.DIAMONDS) 
             return "Diamonds";
-        else if (this.suitType == SuitType.HEARTS) 
+        else if (this._suitType == SuitType.HEARTS) 
             return "Hearts";
         else
             return "Spades";
