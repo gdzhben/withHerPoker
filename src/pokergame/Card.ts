@@ -3,9 +3,9 @@ import { ICard } from './ICard';
 
 export class Card implements ICard {
 
-    private _cardName: string
-    private _suitType: SuitType
-    private _faceValue: number
+    private _cardName: string;
+    private _suitType: SuitType;
+    private _faceValue: number;
 
     constructor(cardName: string, suitType: SuitType, faceValue: number) {
         this._cardName = cardName;
