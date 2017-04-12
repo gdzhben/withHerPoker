@@ -22,4 +22,8 @@ export class HandClassifier implements IHandClassifier {
         return null;
     }
 
+    public updateCards(hand: Hand) {
+        
+    }
+
 }
