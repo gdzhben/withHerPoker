@@ -23,7 +23,13 @@ export class Deck implements IDeck {
         }
 
     }
+<<<<<<< HEAD
     public sizeOfDeck(): number {
+=======
+
+    public sizeOfDeck(): number {
+
+>>>>>>> 15b01ef9b54a13dd2e2e11c94f211013b9cc4e26
         return this._deckOfCards.length;
     }
     public returnCard(card: ICard): void {
