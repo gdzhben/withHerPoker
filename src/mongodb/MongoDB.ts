@@ -1,57 +1,105 @@
-import { IMongoDB } from './IMongoDB';
-import { MongoClient,InsertOneWriteOpResult } from 'mongodb'
+import { IMongoDb } from './IMongoDb';
+import { ILeaderBoard } from './ILeaderBoard';
 import { IGameData } from './IGameData';
+import * as mongoose from 'mongoose';
+import { gameDataSchema } from './Schemas';
+import { GameDataModel } from './Models';
+import * as _ from 'lodash';
 
-export class MongoDB implements IMongoDB {
+export class MongoDb implements IMongoDb {
 
-    // URI containing our localhost credentials.
-    private connectString = "mongodb://admin:admin123@localhost/?authSource=admin&authMechanism=SCRAM-SHA-1";
+    private _db: mongoose.Connection;
+    private _gameDataModel: mongoose.Model<GameDataModel>;
 
-    update(gd: IGameData): Promise<InsertOneWriteOpResult> {
+    constructor(connectionString: string) {
+        require('mongoose').Promise = global.Promise;
+        mongoose.connect(connectionString);
+        this._db = mongoose.connection;
 
-        return MongoClient.connect(this.connectString)
-            .then((db) => {
-                let collection = db.collection('test');
-                let newEntry = {
-                    userName: gd.username, startChips: gd.startChips, endChips: gd.endChips,
-                    startTime: gd.startTime, endTime: gd.endTime, numberOfRounds: gd.numberOfRounds,
-                    endState: gd.endState, numOfCardsDiscarded: gd.numOfCardsDiscarded, gameId: gd.gameId
-                };
-
-                let insertion = collection.insert(newEntry);
-                db.close();
-                return insertion;
-            }).catch((err: Error) => {
-                throw new Error("Connection failed");
-            });
+        this._defineModel();
     }
 
-    getLeaderBoard() {
-
-        return MongoClient.connect(this.connectString)
-            .then((db) => {
-                let collection = db.collection('test');
-                let lb = '';
-
-                 // Iterate through collection
-                let cursor = collection.find();
-
-                //TODO fix incrementing
-                while (cursor.hasNext()) {
-                    lb += cursor.map( function(u: string) {
-                        return u;
-                    });
+    public addGameData(gameData: IGameData): Promise<IGameData> {
+        let model = new this._gameDataModel(gameData);
+        return model.save()
+            .then((result) => {
+                if (result._id) {
+                    return result;
                 }
-
-                db.close();
-                return lb;
-            }).catch((err: Error) => {
-                throw new Error("Connection failed");
+                return Promise.reject('Error occured while saving.');
+            }).catch((err: any) => {
+                let error = new Error(err);
+                return Promise.reject(error);
             });
     }
 
-    getGame(gameID: string) {
+    public getGameData(username: string): Promise<IGameData[]> {
+        return this._gameDataModel
+            .find({
+                username: username
+            })
+            .exec()
+            .then((result) => {
+                if (result) {
+                    return result;
+                }
+                return Promise.reject('Game data for that user doesnot exists.');
+            }).catch((err: any) => {
+                let error = new Error(err);
+                return Promise.reject(error);
+            });
+    }
 
+    public getLeaderboard(limit: number): Promise<ILeaderBoard[]> {
+        return this._gameDataModel
+            .aggregate([
+                {
+                    $group: {
+                        _id: '$username',
+                        totalEndChips: { $sum: '$endChips' },
+                        totalStartChips: { $sum: '$startChips' },
+                        noOfGamesPlayed: { $sum: 1 }
+                    }
+                },
+                { $sort: { totalEndChips: -1 } },
+                { $limit: limit }
+
+            ])
+            .exec()
+            .then((result: Object[]) => {
+                let mapped = _.map(result, (elem: any) => {
+                    let leaderBoard: ILeaderBoard = {
+                        noOfGamesPlayed: elem.noOfGamesPlayed,
+                        totalEndChips: elem.totalEndChips,
+                        totalStartChips: elem.totalStartChips,
+                        username: elem._id
+                    };
+                    return leaderBoard;
+                });
+                return mapped;
+            }).catch((err: any) => {
+                let error = new Error(err);
+                return Promise.reject(error);
+            });
+    }
+
+    public deleteGameData(username: string): Promise<void> {
+        return this._gameDataModel
+            .remove({
+                username: username
+            }).exec()
+            .catch((err: any) => {
+                let error = new Error(err);
+                return Promise.reject(error);
+            });
+    }
+
+    public close(): Promise<void> {
+        return this._db.close();
+    }
+
+    private _defineModel(): void {
+        this._gameDataModel = this._db.model<GameDataModel>('GameData', gameDataSchema);
     }
 }
 

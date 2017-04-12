@@ -5,7 +5,5 @@ export interface IGameData {
     startTime: Date;
     endTime: Date;
     numberOfRounds: number;
-    endState: number;
-    numOfCardsDiscarded: number;
-    gameId: string;
+    endState: string;
 }

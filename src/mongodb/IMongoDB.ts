@@ -1,7 +1,10 @@
 import { IGameData } from './IGameData';
+import { ILeaderBoard } from './ILeaderBoard';
 
-export interface IMongoDB {
-    update(gameData: IGameData): void;
-    getLeaderBoard(gameID: string): void;
-    getGame(gameID: string): void;
+export interface IMongoDb {
+    addGameData(gameData: IGameData): Promise<IGameData>;
+    getGameData(username: string): Promise<IGameData[]>;
+    getLeaderboard(limit: number): Promise<ILeaderBoard[]>;
+    deleteGameData(username: string): Promise<void>;
+    close(): Promise<void>;
 }
