@@ -25,6 +25,7 @@
     "@types/mongodb": "^2.1.43",
     "@types/mongoose": "^4.7.10",
     "@types/node": "^7.0.12",
+    "@types/twit": "^2.2.4",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
     "gulp-jasmine": "^2.4.2",
@@ -40,7 +41,7 @@
     "lodash": "^4.17.4",
     "mongodb": "^2.2.25",
     "mongoose": "^4.9.4",
-    "twitter-node-client": "0.0.6"
+    "twit": "^2.2.5"
   },
   "config": {
     "pre-git": {

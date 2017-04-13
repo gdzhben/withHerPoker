@@ -1,16 +1,22 @@
-import { TwitterBot } from "./twitter";
+import { TwitterBot } from "./TwitterBot";
+import { ITwitterBot } from "./ITwitterBot";
+import { twitterConfig } from './twitter-config'
 
 describe('TwitterBot', () => {
 
-    beforeEach(() => {
+    let twitterBot: ITwitterBot;
+    let otherScreenName = 'SukratKashyap';
+    let screenName = 'withherpoker';
 
+    beforeEach(() => {
+        twitterBot = new TwitterBot(twitterConfig);
     });
 
     describe('postTweet', () => {
 
         xit('when status is not empty should post successfully', (done) => {
             let expectedTweet = 'Test tweet';
-            TwitterBot.postTweet(expectedTweet)
+            twitterBot.postTweet(expectedTweet)
                 .then(() => {
                     done();
                 })
@@ -19,9 +25,9 @@ describe('TwitterBot', () => {
                 });
         });
 
-        xit('when status is blank should throw error', (done) => {
+        it('when status is blank should throw error', (done) => {
             let expectedTweet = '';
-            TwitterBot.postTweet(expectedTweet)
+            twitterBot.postTweet(expectedTweet)
                 .then(() => {
                     done.fail();
                 })
@@ -34,11 +40,10 @@ describe('TwitterBot', () => {
 
     describe('getUsername', () => {
 
-        xit('should return screen_name', (done) => {
-            let expectedUsername = 'withherpoker';
-            TwitterBot.getUsername()
+        it('should return screen_name', (done) => {
+            twitterBot.getUsername()
                 .then((username: string) => {
-                    expect(username).toBe(expectedUsername);
+                    expect(username).toBe(screenName);
                     done();
                 })
                 .catch((err: Error) => {
@@ -49,10 +54,9 @@ describe('TwitterBot', () => {
 
     describe('sendDirectMessage', () => {
 
-        xit('should send message to darryl', (done) => {
-            let toScreenName = 'SukratKashyap';
-            let text = 'test direct message!';
-            TwitterBot.sendDirectMessage(toScreenName, text)
+        xit('should send message successfully', (done) => {
+            let text = 'Test direct message!';
+            twitterBot.sendDirectMessage(otherScreenName, text)
                 .then(() => {
                     done();
                 })
@@ -60,13 +64,24 @@ describe('TwitterBot', () => {
                     done.fail(err);
                 });
         });
+
+        it('should throw error if the message is empty', (done) => {
+            let text = '';
+            twitterBot.sendDirectMessage(otherScreenName, text)
+                .then(() => {
+                    done.fail('Empty messsage should not be sent!');
+                })
+                .catch((err: Error) => {
+                    expect(err.message).toBe('There was an error sending your message: Your message cannot be blank..');
+                    done();
+                });
+        });
     });
 
     describe('createFriendship', () => {
 
-        xit('should create friendship', (done) => {
-            let toScreenName = 'SukratKashyap';
-            TwitterBot.createFriendship(toScreenName)
+        it('should create friendship', (done) => {
+            twitterBot.createFriendship(otherScreenName)
                 .then(() => {
                     done();
                 })
