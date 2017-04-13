@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "tsc && gulp test",
-    "build": "gulp cleanjs && tsc"
+    "build": "gulp cleanjs && tsc",
+    "coverage": "npm run build && gulp coverage && gulp open-coverage-report"
   },
   "repository": {
     "type": "git",
@@ -28,11 +29,15 @@
     "@types/twit": "^2.2.4",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
+    "gulp-istanbul": "^1.1.1",
     "gulp-jasmine": "^2.4.2",
     "gulp-jasmine-browser": "^1.7.1",
+    "gulp-open": "^2.0.0",
+    "istanbul": "^0.4.5",
     "jasmine": "^2.5.3",
     "jscs": "^3.0.7",
     "pre-git": "^3.14.0",
+    "remap-istanbul": "^0.9.5",
     "typescript": "2.1.6",
     "typings": "^2.1.0"
   },
