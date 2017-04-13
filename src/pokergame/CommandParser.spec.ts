@@ -12,7 +12,7 @@ describe('CommandParser', () => {
 
     describe('parseToString', () => {
 
-        it('it must return ', () => {
+        it('must return ', () => {
             let testCommand = new Command(CommandType.Fold, 5);
 
             let result = testParser.parseToString(testCommand);
@@ -23,12 +23,45 @@ describe('CommandParser', () => {
 
     describe('parseToObject', () => {
 
-        it('it must return new Command object with command See and argument 7.', () => {
+        it('must return new Command object with command See and argument 7.', () => {
             let testString = "See 7";
 
             let result = testParser.parseToObject(testString);
 
             expect(result.toString()).toBe(new Command(CommandType.See, 7).toString());
+        });
+    });
+
+    describe('parseToObject', () => {
+
+        it('must return new Command object with command See and argument 7.', () => {
+            let testString = "See 7 test";
+
+            let result = testParser.parseToObject(testString);
+
+            expect(result.toString()).toBe(new Command(CommandType.See, 7).toString());
+        });
+    });
+
+    describe('parseToObject', () => {
+
+        it('must return new Command object with command See and argument 7.', () => {
+            let testString = "See 7 test";
+
+            let result = testParser.parseToObject(testString);
+
+            expect(result.toString()).toBe(new Command(CommandType.See, 7).toString());
+        });
+    });
+
+    describe('parseToObject', () => {
+
+        it('must return new Command object with command See and argument 7.', () => {
+            let testString = "See7";
+
+            let result = function () { testParser.parseToObject(testString); };
+
+            expect(result).toThrow(new Error('No spaces. Cannot parse input.'));
         });
     });
 });

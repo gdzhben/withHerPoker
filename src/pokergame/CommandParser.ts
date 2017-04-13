@@ -9,11 +9,15 @@ export class CommandParser implements ICommandParser {
     };
 
     public parseToObject(commandString: string) {
+        if (!(commandString.indexOf(' ') > -1)) {
+            throw new Error('No spaces. Cannot parse input.');
+        }
+
         let tokens = commandString.split(' ');
 
         let command = tokens[0];
         let argument = tokens[1];
-
+        
         if (!(command in CommandType)) {
             throw new Error(command + " is not a valid command.");
         }
