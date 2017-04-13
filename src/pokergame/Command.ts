@@ -21,6 +21,6 @@ export class Command implements ICommand {
     }
 
     public toString(): string {
-        return this._commandType.toString() + ' ' + this._argument;
+        return CommandType[this._commandType] + ' ' + this._argument;
     }
 }
