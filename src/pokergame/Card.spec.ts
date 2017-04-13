@@ -5,25 +5,24 @@ describe('Card', () => {
 
     let test: Card;
     let testSuit = SuitType.CLUBS;
-    let testStr = "testing";
     let testFace = 13;
 
     beforeEach(() => {
-        test = new Card(testStr, testSuit, testFace);
+        test = new Card(testSuit, testFace);
     });
 
-    describe('getCardName', () => {
+    describe('getCardType', () => {
 
-        it('it must return testing', () => {
-            let result = test.getCardName();
+        it('must return K', () => {
+            let result = test.getCardType();
 
-            expect(result).toBe('testing');
+            expect(result).toBe('K');
         });
     });
 
     describe('getSuitType', () => {
 
-        it('it must return hello', () => {
+        it('must return CLUBS', () => {
             let result = test.getSuitType();
 
             expect(result).toBe(SuitType.CLUBS);

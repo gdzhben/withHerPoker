@@ -2,20 +2,17 @@ import { SuitType } from '../types/SuitType';
 import { ICard } from './ICard';
 
 export class Card implements ICard {
+    private _suitType: SuitType;
+    private _faceValue: number;
+    private readonly CARD_TYPES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    private _cardName: string
-    private _suitType: SuitType
-    private _faceValue: number
-
-    constructor(cardName: string, suitType: SuitType, faceValue: number) {
-        this._cardName = cardName;
+    constructor(suitType: SuitType, faceValue: number) {
         this._suitType = suitType;
         this._faceValue = faceValue;
     }
 
-    public getCardName(): string {
-
-        return this._cardName;
+    public getCardType(): string {
+        return this.CARD_TYPES[this._faceValue - 1];
     }
 
     public getSuitType(): SuitType {
@@ -24,25 +21,9 @@ export class Card implements ICard {
 
     public getFaceValue(): number {
         return this._faceValue;
-
-
     }
 
-    public getSuitTypeString(): string {
-        if (this._suitType == SuitType.CLUBS) 
-            return "Clubs";
-        else if (this._suitType == SuitType.DIAMONDS) 
-            return "Diamonds";
-        else if (this._suitType == SuitType.HEARTS) 
-            return "Hearts";
-        else
-            return "Spades";
+    public toString() {
+        return this.CARD_TYPES[this._faceValue - 1] + SuitType[this._suitType];
     }
-
-    public toString(): string {
-        let str = this.getCardName() + this.getSuitTypeString();
-        return str;
-
-    }
-
 }

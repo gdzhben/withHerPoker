@@ -1,13 +1,14 @@
+import * as _ from 'lodash';
+
 import { IHand } from './IHand';
-import { Card } from './Card';
+import { ICard } from './ICard';
 
 export class Hand implements IHand {
-
     private _size: number;
-    private _cards: Card[];
+    private _cards: ICard[];
     private _discardedCount: number;
 
-    constructor(cards: Card[]) {
+    constructor(cards: ICard[]) {
         if (cards.length != 5)
             throw new Error("Expected array of size 5");
 
@@ -22,52 +23,35 @@ export class Hand implements IHand {
         this.sort();
     }
 
-    // Remove the card at index from the hand.
-    public discard(index: number): Card {
+    public discard(index: number): ICard {
         if (index < 0 || index > this._size)
             throw new Error("Index out of bounds");
         else if (this._discardedCount >= 3)
             throw new Error("A maximum of 3 cards can be discarded");
 
-        let temp: Card = this._cards[index];
+        let temp: ICard = this._cards[index];
         this._cards.splice(index, 1);
         this._size = this._cards.length;
         this._discardedCount++;
         return temp;
     }
 
-    // Add a card to the hand if the hand is not full.
-    public receiveCard(newCard: Card): void {
+    public receiveCard(newCard: ICard): void {
         if (this._cards.length >= 5)
             throw new Error("Hand is full")
 
-        // 'push' appends to end of array.
         this._cards.push(newCard);
         this._size = this._cards.length;
         this.sort();
     }
 
-    // Sort the cards based on their Face Value.
     public sort(): void {
-        while (true) {
-            let swapped: boolean = false;
-
-            for (let i = 0; i < this._size - 1; i++) {
-                if (this._cards[i].getFaceValue() > this._cards[i + 1].getFaceValue()) {
-                    let temp: Card = this._cards[i];
-                    this._cards[i] = this._cards[i + 1];
-                    this._cards[i + 1] = temp;
-                    swapped = true;
-                }
-            }
-
-            if (swapped == false)
-                break;
-        }
+        this._cards = _.sortBy(this._cards, (elem) => {
+            return elem.getFaceValue();
+        });
     }
 
-    // Return the card for the specified index.
-    public getCard(index: number): Card {
+    public getCard(index: number): ICard {
         if (index < 0 || index > 4)
             throw new Error("Index out of range")
 
@@ -78,19 +62,15 @@ export class Hand implements IHand {
         return this._size;
     }
 
-    // Get the number of cards that have been discarded from the hand.
     public getDiscardedCount(): number {
         return this._discardedCount;
     }
 
-    // CHANGE THIS ONCE TOSTRING() HAS BEEN ADDED TO CARD CLASS!
     public toString(): string {
-        let str = "";
+        let mapped = _.map(this._cards, (elem) => {
+            return elem.toString();
+        });
 
-        for (let card of this._cards) {
-            str += card.toString() + " ";
-        }
-
-        return str;
+        return _.join(mapped, ' ');
     }
 }

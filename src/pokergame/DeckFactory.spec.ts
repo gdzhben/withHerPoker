@@ -23,15 +23,6 @@ describe('DeckFactory', () => {
             expect(deckFilter.length).toBe(13);
         });
 
-        it('A should have 4 different suits card', () => {
-            let deckOfCards = DeckFactory.createStandardCards();
-
-            let deckFilter = _.filter(deckOfCards, (elem: ICard) => {
-                return elem.getCardName() == 'A';
-            });
-
-            expect(deckFilter.length).toBe(4);
-        });
 
         it('2 facevalue should have 4 different suits card', () => {
             let deckOfCards = DeckFactory.createStandardCards();

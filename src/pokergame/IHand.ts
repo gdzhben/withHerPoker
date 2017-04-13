@@ -1,14 +1,14 @@
-import { Card } from './Card';
+import { ICard } from './ICard';
 
 export interface IHand {
 
-    discard(index: number): Card;
+    discard(index: number): ICard;
 
-    receiveCard(newCard: Card): void;
+    receiveCard(newCard: ICard): void;
 
     sort(): void;
 
-    getCard(index: number): Card;
+    getCard(index: number): ICard;
 
     size(): number;
 
