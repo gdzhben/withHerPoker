@@ -31,10 +31,10 @@ describe('Command', () => {
 
     describe('toString', () => {
 
-        it('it must return 0 5', () => {
+        it('it must return See 5', () => {
             let result = test.toString();
 
-            expect(result).toBe('0 5');
+            expect(result).toBe('See 5');
         });
     });
 });

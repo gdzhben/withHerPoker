@@ -2,5 +2,6 @@ export enum CommandType {
     See,
     Raise,
     Fold,
-    Show
+    Show,
+    Discard
 }

@@ -32,12 +32,12 @@ describe('Player', () => {
 
     describe('setCommand and getCommand', () => {
 
-        it('it must return 13', () => {
+        it('Command must be Fold 3.', () => {
             let testCommand = new Command(CommandType.Fold, 3);
             test.setCommand(testCommand);
             let result = test.getCommand().toString();
 
-            expect(result).toBe('2 3');
+            expect(result).toBe('Fold 3');
         });
     });
 });
