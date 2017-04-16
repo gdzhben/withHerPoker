@@ -12,7 +12,7 @@ describe('HandClassifier', () => {
     });
     describe('getTypeOfHand', () => {
 
-        xit('Should return twopair.', () => {
+        it('Should return twopair.', () => {
             let testCards: ICard[] = [];
             testCards[0] = new Card(SuitType.CLUBS, 2);
             testCards[1] = new Card(SuitType.DIAMONDS, 2);
@@ -26,7 +26,7 @@ describe('HandClassifier', () => {
     });
     describe('getTypeOfHand', () => {
 
-        xit('Should return onepair.', () => {
+        it('Should return onepair.', () => {
             let testCards: ICard[] = [];
             testCards[0] = new Card(SuitType.CLUBS, 2);
             testCards[1] = new Card(SuitType.DIAMONDS, 2);
@@ -54,7 +54,7 @@ describe('HandClassifier', () => {
     });
     describe('getTypeOfHand', () => {
 
-        xit('Should return royal flush.', () => {
+        it('Should return royal flush.', () => {
             let testCards: ICard[] = [];
             testCards[0] = new Card(SuitType.DIAMONDS, 1);
             testCards[1] = new Card(SuitType.DIAMONDS, 10);

@@ -6,83 +6,79 @@ import * as _ from 'lodash';
 
 export class HandClassifier implements IHandClassifier {
     private _hand: IHand;
-    private _handOfCards: ICard[] = [];
-    private _typeOfHand: HandType;
-    private _suitCount: any = {};
-    private _faceCount: any = {};
-    private readonly SIZE_OF_HAND: number = 5;
 
     constructor(hand: IHand) {
         this._hand = hand;
     }
 
-    private getCardsFromHand(): void {
-        for (let i = 0; i < this.SIZE_OF_HAND; i++) {
-            this._handOfCards.push(this._hand.getCard(i));
-        }
-    }
-
-    private createSuitCount(): void {
-        _.forEach(this._handOfCards, (elem) => {
-            if (_.hasIn(elem.getSuitType(), _.keysIn(this._suitCount))) {
-                this._suitCount[elem.getSuitType()] += 1;
-            } else {
-                this._suitCount[elem.getSuitType()] = 1;
-            }
+    private getCardsFromHand(): ICard[] {
+        return _.times(this._hand.size(), (i) => {
+            return this._hand.getCard(i);
         })
     }
 
-    private createFaceCount(): void {
-        _.forEach(this._handOfCards, (elem) => {
-            if (_.hasIn(elem.getFaceValue(), _.keysIn(this._faceCount))) {
-                this._faceCount[elem.getFaceValue()] += 1;
-            } else {
-                this._faceCount[elem.getFaceValue()] = 1;
-            }
-        })
+    private createSuitCount(cards: ICard[]): {
+        [key: number]: number
+    } {
+        let suitCount = {};
+        _.forEach(cards, (elem) => {
+            let value = _.get(suitCount, elem.getSuitType(), 0);
+            suitCount[elem.getSuitType()] = value + 1;
+        });
+        return suitCount;
     }
 
-    private isInOrder(): boolean {
-        for (let i = 0; i < this._handOfCards.length - 1; i++) {
-            if (this._handOfCards[i + 1].getFaceValue() != (this._handOfCards[i].getFaceValue() + 1)) {
+    private createFaceCount(cards: ICard[]): {
+        [key: string]: number
+    } {
+        let faceCount = {};
+        _.forEach(cards, (elem) => {
+            let value = _.get(faceCount, elem.getFaceValue(), 0);
+            faceCount[elem.getFaceValue()] = value + 1;
+        });
+        return faceCount;
+    }
+
+    private isInOrder(cards: ICard[]): boolean {
+        for (let i = 0; i < cards.length - 1; i++) {
+            if (cards[i + 1].getFaceValue() != (cards[i].getFaceValue() + 1)) {
                 return false;
             }
         }
-
         return true;
     }
 
     public getTypeOfHand(): HandType {
-        this._hand.sort;
-        this.getCardsFromHand();
-        this.createSuitCount();
-        this.createFaceCount();
-        let isInOrder = this.isInOrder();
+        this._hand.sort();
+        let cards = this.getCardsFromHand();
+        let suitCount = this.createSuitCount(cards);
+        let faceCount = this.createFaceCount(cards);
+        let isInOrder = this.isInOrder(cards);
 
-        if (_.hasIn(1, this._faceCount)
-            && _.hasIn(13, this._faceCount)
-            && _.hasIn(12, this._faceCount)
-            && _.hasIn(11, this._faceCount)
-            && _.hasIn(10, this._faceCount)
-            && _.keysIn(this._suitCount).length == 1) {
+        if (_.hasIn(faceCount, 1)
+            && _.hasIn(faceCount, 10)
+            && _.hasIn(faceCount, 11)
+            && _.hasIn(faceCount, 12)
+            && _.hasIn(faceCount, 13)
+            && _.keysIn(suitCount).length == 1) {
             return HandType.RoyalFlush;
         }
 
         if (isInOrder
-            && _.keysIn(this._suitCount).length == 1) {
+            && _.keysIn(suitCount).length == 1) {
             return HandType.StraightFlush;
         }
 
-        if (_.hasIn(4, _.valuesIn(this._faceCount))) {
+        if (_.includes(_.valuesIn(faceCount), 4)) {
             return HandType.FourOfAKind;
         }
 
-        if (_.hasIn(2, _.valuesIn(this._faceCount))
-            && (_.hasIn(3, _.valuesIn(this._faceCount)))) {
+        if (_.includes(_.valuesIn(faceCount), 2)
+            && _.includes(_.valuesIn(faceCount), 3)) {
             return HandType.FullHouse;
         }
 
-        if (_.keysIn(this._suitCount).length == 1) {
+        if (_.keysIn(suitCount).length == 1) {
             return HandType.Flush;
         }
 
@@ -90,17 +86,17 @@ export class HandClassifier implements IHandClassifier {
             return HandType.Straight;
         }
 
-        if (_.hasIn(3, _.valuesIn(this._faceCount))) {
+        if (_.includes(_.valuesIn(faceCount), 3)) {
             return HandType.ThreeOfAKind;
         }
 
-        if (_.hasIn(2, _.valuesIn(this._faceCount))
-            && _.keysIn(this._faceCount).length == 3) {
+        if (_.includes(_.valuesIn(faceCount), 2)
+            && _.keysIn(faceCount).length == 3) {
             return HandType.TwoPairs;
         }
 
-        if ((_.hasIn(2, _.valuesIn(this._faceCount)))
-            && (_.keysIn(this._faceCount).length == 4)) {
+        if (_.includes(_.valuesIn(faceCount), 2)
+            && (_.keysIn(faceCount).length == 4)) {
             return HandType.OnePair;
         }
 
