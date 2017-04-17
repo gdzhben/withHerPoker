@@ -5,7 +5,7 @@ import { twitterConfig } from './twitter-config'
 describe('TwitterBot', () => {
 
     let twitterBot: ITwitterBot;
-    let otherScreenName = 'SukratKashyap';
+    let otherUserId = '3413391913';
     let screenName = 'withherpoker';
 
     beforeEach(() => {
@@ -54,9 +54,9 @@ describe('TwitterBot', () => {
 
     describe('sendDirectMessage', () => {
 
-        xit('should send message successfully', (done) => {
+        it('should send message successfully', (done) => {
             let text = 'Test direct message!';
-            twitterBot.sendDirectMessage(otherScreenName, text)
+            twitterBot.sendDirectMessage(otherUserId, text)
                 .then(() => {
                     done();
                 })
@@ -67,7 +67,7 @@ describe('TwitterBot', () => {
 
         it('should throw error if the message is empty', (done) => {
             let text = '';
-            twitterBot.sendDirectMessage(otherScreenName, text)
+            twitterBot.sendDirectMessage(otherUserId, text)
                 .then(() => {
                     done.fail('Empty messsage should not be sent!');
                 })
@@ -81,7 +81,7 @@ describe('TwitterBot', () => {
     describe('createFriendship', () => {
 
         it('should create friendship', (done) => {
-            twitterBot.createFriendship(otherScreenName)
+            twitterBot.createFriendship(otherUserId)
                 .then(() => {
                     done();
                 })

@@ -2,7 +2,7 @@
   "name": "poker",
   "version": "1.0.0",
   "description": "Twitter based implementation of pokergame",
-  "main": "index.js",
+  "main": "./build/main.js",
   "scripts": {
     "test": "tsc && gulp test",
     "build": "gulp cleanjs && tsc",

@@ -17,6 +17,18 @@
                 "${workspaceRoot}/build/**/*.js"
             ],
             "preLaunchTask": "tsc"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceRoot}/build/main.js",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "tsc",
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/build/**/*.js"
+            ]
         }
     ]
 }
