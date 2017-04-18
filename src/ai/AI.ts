@@ -3,16 +3,13 @@ import { IAI } from './IAI';
 export class AI implements IAI {
     private bluffAbility: number;
     private riskAversion: number;
-    private composure: number;
-    private cardCounting: number;
     private gameInfo: any;
     private myInfo: any;
 
     constructor(gameInfo: any, myInfo: any) {
         this.bluffAbility = Math.floor((Math.random() * 10) + 1);
         this.riskAversion = Math.floor((Math.random() * 10) + 1);
-        this.composure = Math.floor((Math.random() * 10) + 1);
-        this.cardCounting = Math.floor((Math.random() * 10) + 1);
+        
         this.gameInfo = gameInfo;
         this.myInfo = myInfo;
     }
@@ -31,7 +28,7 @@ export class AI implements IAI {
     // bet = (hand rank / 10) * totalChips.
     // e.g. HighHand: (0 / 10) * totalChips = 0.
     private betAmount(): number {
-        let bet = this.myInfo.handType() * this.myInfo.totalChips();
+        let bet = this.myInfo.getHandType() * this.myInfo.totalChips();
 
         return bet;
     }
@@ -66,29 +63,59 @@ export class AI implements IAI {
     }
 
     private getSeeRating(): number {
+        let rating = this.riskAversion - this.bluffAbility;
 
-        return 0;
+        return rating;
     }
 
     private getRaiseRating(): number {
+        let rating = this.bluffAbility - this.riskAversion;
 
-        return 0;
+        return rating;
     }
 
     private getFoldRating(): number {
+        let rating = this.riskAversion - this.bluffAbility;
 
-        return 0;
+        return rating;
     }
 
     private getDiscardRating(): number {
+        if (this.gameInfo.getRoundNumber() == 1) {
+            return 0;
+        }
 
-        return 0;
+        let rating = 0;
+
+        let bluffAbility = this.bluffAbility;
+        let riskAversion = this.riskAversion;
+
+        if (this.myInfo.getHandType() > 8) {
+            rating = this.bluffAbility - this.riskAversion;
+        } else if (this.myInfo.getHandType() < 4) {
+            rating = this.riskAversion - this.bluffAbility;
+        }
+
+        return rating;
     }
 
     private getShowRating(): number {
+        if (this.gameInfo.getRoundNumber() == 1) {
+            return 0;
+        }
 
-        return 0;
+        let rating = 0;
+
+        let bluffAbility = this.bluffAbility;
+        let riskAversion = this.riskAversion;
+
+        if (this.myInfo.getHandType() > 8) {
+            rating = this.bluffAbility - this.riskAversion;
+        } else if (this.myInfo.getHandType() < 4) {
+            rating = this.riskAversion - this.bluffAbility;
+        }
+
+        return rating;
     }
-
 
 }
