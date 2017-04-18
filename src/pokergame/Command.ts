@@ -1,5 +1,5 @@
 import { ICommand } from './ICommand';
-import { CommandType } from '../types/CommandType';
+import { CommandType } from '../interfaces';
 
 export class Command implements ICommand {
 

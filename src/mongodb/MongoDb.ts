@@ -1,10 +1,9 @@
-import { IMongoDb } from './IMongoDb';
-import { ILeaderBoard } from './ILeaderBoard';
-import { IGameData } from './IGameData';
 import * as mongoose from 'mongoose';
+import * as _ from 'lodash';
+
+import { IMongoDb, IGameData, ILeaderBoard } from '../interfaces';
 import { gameDataSchema } from './Schemas';
 import { GameDataModel } from './Models';
-import * as _ from 'lodash';
 
 export class MongoDb implements IMongoDb {
 

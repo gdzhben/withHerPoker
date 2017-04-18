@@ -1,4 +1,4 @@
-import { SuitType } from '../types/SuitType';
+import { SuitType } from '../interfaces';
 import { Card } from './Card'
 import { IDeck } from './IDeck';
 import { ICard } from './ICard';

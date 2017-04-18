@@ -1,10 +1,9 @@
 import { TwitterBot } from "./TwitterBot";
-import { ITwitterBot } from "./ITwitterBot";
 import { twitterConfig } from './twitter-config'
 
 describe('TwitterBot', () => {
 
-    let twitterBot: ITwitterBot;
+    let twitterBot: TwitterBot;
     let otherUserId = '3413391913';
     let screenName = 'withherpoker';
 

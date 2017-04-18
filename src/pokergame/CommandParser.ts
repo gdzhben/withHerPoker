@@ -1,6 +1,6 @@
 import { ICommandParser } from './ICommandParser';
 import { Command } from './Command';
-import { CommandType } from '../types/CommandType';
+import { CommandType } from '../interfaces';
 
 export class CommandParser implements ICommandParser {
     private readonly commands = {

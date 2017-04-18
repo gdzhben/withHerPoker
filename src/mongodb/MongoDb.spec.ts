@@ -1,11 +1,11 @@
-import { MongoDb } from './MongoDb'
-import { IMongoDb } from './IMongoDb'
-import { IGameData } from './IGameData';
 import * as mongoose from 'mongoose';
+
+import { MongoDb } from './MongoDb';
+import { IGameData } from '../interfaces';
 
 describe('MongoDb', () => {
 
-    let mongoDb: IMongoDb;
+    let mongoDb: MongoDb;
     let mockUsername = 'sukrat';
     let testConnectionString = 'mongodb://withHer:1234@localhost/test';
 

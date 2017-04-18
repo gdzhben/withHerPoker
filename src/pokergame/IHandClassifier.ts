@@ -1,4 +1,4 @@
-import { HandType } from '../types/HandType';
+import { HandType } from '../interfaces';
 
 export interface IHandClassifier {
     getTypeOfHand(): HandType;

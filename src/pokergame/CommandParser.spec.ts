@@ -1,5 +1,5 @@
 import { CommandParser } from "./CommandParser";
-import { CommandType } from '../types/CommandType';
+import { CommandType } from '../interfaces';
 import { Command } from "./Command";
 
 describe('CommandParser', () => {

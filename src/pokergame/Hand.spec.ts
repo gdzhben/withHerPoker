@@ -1,7 +1,7 @@
 import { Hand } from "./Hand";
 import { ICard } from './ICard';
 import { Card } from './Card';
-import { SuitType } from '../types/SuitType';
+import { SuitType } from '../interfaces';
 
 describe('Hand', function () {
 

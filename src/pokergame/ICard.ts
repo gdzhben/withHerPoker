@@ -1,4 +1,4 @@
-import { SuitType } from '../types/SuitType';
+import { SuitType } from '../interfaces';
 
 export interface ICard {
     getCardType(): string;

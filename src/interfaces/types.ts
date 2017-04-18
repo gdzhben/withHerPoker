@@ -1,3 +1,11 @@
+export enum CommandType {
+    See,
+    Raise,
+    Fold,
+    Show,
+    Discard
+}
+
 export enum HandType {
     RoyalFlush,
     StraightFlush,
@@ -9,4 +17,11 @@ export enum HandType {
     TwoPairs,
     OnePair,
     HighHand
+}
+
+export enum SuitType {
+    HEARTS,
+    CLUBS,
+    SPADES,
+    DIAMONDS
 }

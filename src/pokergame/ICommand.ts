@@ -1,4 +1,4 @@
-import { CommandType } from '../types/CommandType';
+import { CommandType } from '../interfaces';
 
 export interface ICommand {
     getCommandType(): CommandType;

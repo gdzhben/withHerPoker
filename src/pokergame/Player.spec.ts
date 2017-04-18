@@ -1,6 +1,6 @@
 import { Player } from "./Player";
 import { Command } from './Command';
-import { CommandType } from '../types/CommandType';
+import { CommandType } from '../interfaces';
 
 describe('Player', () => {
 

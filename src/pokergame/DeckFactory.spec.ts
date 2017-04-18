@@ -1,7 +1,7 @@
 import { DeckFactory } from "./DeckFactory";
 import { ICard } from "./ICard";
-import { SuitType } from '../types/SuitType'
-import { HandType } from '../types/HandType'
+import { SuitType } from '../interfaces'
+import { HandType } from '../interfaces'
 import * as _ from 'lodash';
 
 describe('DeckFactory', () => {

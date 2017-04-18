@@ -1,6 +1,6 @@
-import { ITwitterBot } from './twitter-bot/ITwitterBot'
-import { TwitterBot } from './twitter-bot/TwitterBot'
-import { twitterConfig } from './twitter-bot/twitter-config'
+import { ITwitterBot } from './interfaces';
+import { TwitterBot } from './twitter-bot/TwitterBot';
+import { twitterConfig } from './twitter-bot/twitter-config';
 
 
 export class App {
@@ -11,7 +11,7 @@ export class App {
         this._twitterBot = new TwitterBot(twitterConfig);
     }
 
-    public start(): void{
+    public start(): void {
         this._twitterBot.start();
 
         this._twitterBot.directMessagesStream()

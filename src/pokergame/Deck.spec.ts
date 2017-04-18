@@ -1,6 +1,6 @@
 import { Card } from "./Card";
 import { Deck } from "./Deck";
-import { SuitType } from '../types/SuitType';
+import { SuitType } from '../interfaces';
 import { DeckFactory } from './DeckFactory'
 import * as _ from 'lodash';
 

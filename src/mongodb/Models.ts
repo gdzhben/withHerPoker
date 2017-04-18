@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
-import { IGameData } from './IGameData';
+
+import { IGameData } from '../interfaces';
 
 export interface GameDataModel extends IGameData, mongoose.Document {
 

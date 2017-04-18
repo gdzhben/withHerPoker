@@ -1,4 +1,7 @@
-import { IUser } from './IUser';
+export interface IUser {
+    id: string
+    screenName: string
+}
 
 export interface ITwitterBot {
     postTweet(status: string): Promise<void>;

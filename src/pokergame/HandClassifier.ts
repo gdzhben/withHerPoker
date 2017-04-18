@@ -1,5 +1,5 @@
 import { IHandClassifier } from './IHandClassifier';
-import { HandType } from '../types/HandType';
+import { HandType } from '../interfaces';
 import { IHand } from './IHand';
 import { ICard } from './ICard';
 import * as _ from 'lodash';

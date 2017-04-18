@@ -1,5 +1,5 @@
 import { Card } from "./Card";
-import { SuitType } from '../types/SuitType';
+import { SuitType } from '../interfaces';
 
 describe('Card', () => {
 

@@ -1,12 +1,13 @@
 import { Schema } from 'mongoose';
-import { IGameData } from './IGameData';
+
+import { IGameData } from '../interfaces';
 
 export const gameDataSchema = new Schema({
     username: {
         type: Schema.Types.String,
         required: true
     },
-    startChips:{
+    startChips: {
         type: Schema.Types.Number,
         required: true
     },

@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 import * as Twit from 'twit';
 
-import { ITwitterBot } from './ITwitterBot';
-import { IUser } from './IUser';
+import { ITwitterBot, IUser } from '../interfaces';
 
 export class TwitterBot implements ITwitterBot {
 

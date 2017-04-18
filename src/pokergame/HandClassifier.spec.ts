@@ -2,8 +2,8 @@ import { ICard } from "./ICard";
 import { Card } from "./Card";
 import { IHand } from "./IHand";
 import { Hand } from "./Hand";
-import { HandType } from '../types/HandType'
-import { SuitType } from '../types/SuitType'
+import { HandType } from '../interfaces'
+import { SuitType } from '../interfaces'
 import { HandClassifier } from './HandClassifier';
 
 describe('HandClassifier', () => {
