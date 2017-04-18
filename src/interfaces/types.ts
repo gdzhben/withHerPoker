@@ -20,8 +20,8 @@ export enum HandType {
 }
 
 export enum SuitType {
-    HEARTS,
-    CLUBS,
-    SPADES,
-    DIAMONDS
+    Hearts,
+    Clubs,
+    Spades,
+    Diamonds
 }

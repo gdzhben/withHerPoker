@@ -1,5 +1,5 @@
+import { CommandType } from '../../interfaces';
 import { Command } from "./Command";
-import { CommandType } from '../interfaces';
 
 describe('Command', () => {
 

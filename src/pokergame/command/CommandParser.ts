@@ -1,6 +1,5 @@
-import { ICommandParser } from './ICommandParser';
+import { CommandType, ICommandParser } from '../../interfaces';
 import { Command } from './Command';
-import { CommandType } from '../interfaces';
 
 export class CommandParser implements ICommandParser {
     private readonly commands = {
@@ -17,7 +16,7 @@ export class CommandParser implements ICommandParser {
 
         let command = tokens[0];
         let argument = tokens[1];
-        
+
         if (!(command in CommandType)) {
             throw new Error(command + " is not a valid command.");
         }

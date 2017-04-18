@@ -1,8 +1,7 @@
-import { DeckFactory } from "./DeckFactory";
-import { ICard } from "./ICard";
-import { SuitType } from '../interfaces'
-import { HandType } from '../interfaces'
 import * as _ from 'lodash';
+
+import { ICard, SuitType, HandType } from "../../interfaces";
+import { DeckFactory } from "./DeckFactory";
 
 describe('DeckFactory', () => {
 
@@ -17,12 +16,11 @@ describe('DeckFactory', () => {
             let deckOfCards = DeckFactory.createStandardCards();
 
             let deckFilter = _.filter(deckOfCards, (elem: ICard) => {
-                return elem.getSuitType() == SuitType.CLUBS;
+                return elem.getSuitType() == SuitType.Clubs;
             });
 
             expect(deckFilter.length).toBe(13);
         });
-
 
         it('2 facevalue should have 4 different suits card', () => {
             let deckOfCards = DeckFactory.createStandardCards();

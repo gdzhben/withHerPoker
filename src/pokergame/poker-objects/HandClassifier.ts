@@ -1,8 +1,6 @@
-import { IHandClassifier } from './IHandClassifier';
-import { HandType } from '../interfaces';
-import { IHand } from './IHand';
-import { ICard } from './ICard';
 import * as _ from 'lodash';
+
+import { IHandClassifier, HandType, IHand, ICard } from '../../interfaces';
 
 export class HandClassifier implements IHandClassifier {
     private _hand: IHand;
