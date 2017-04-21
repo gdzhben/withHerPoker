@@ -24,6 +24,7 @@ export class AI implements IAI {
         }
     }
 
+    // Argument for raise command.
     // Bet should be in proportion with hand rank.
     // bet = (hand rank / 10) * totalChips.
     // e.g. HighHand: (0 / 10) * totalChips = 0.
@@ -34,13 +35,11 @@ export class AI implements IAI {
     }
 
     // Return string corresponding to command with highest rating.
-    public getCommand(): string {
+    public getTurnCommand(): string {
         let ratings = [
             {"see": this.getSeeRating()}, 
             {"raise": this.getRaiseRating()},
-            {"fold": this.getFoldRating()},
-            {"discard": this.getDiscardRating()},
-            {"show": this.getShowRating()}
+            {"fold": this.getFoldRating()}
         ]
         
         let max = 0;
@@ -62,38 +61,121 @@ export class AI implements IAI {
         return outputCommand;
     }
 
-    private getSeeRating(): number {
-        let rating = this.riskAversion - this.bluffAbility;
+    private getSeeRating(): number {  
+        let rating = 0;
+
+        switch (this.myInfo.getHandType()) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                rating += (this.bluffAbility / 10) + 1;
+            case 5:
+                rating += 1;
+                rating += (this.bluffAbility / 9) + 1;
+                break;
+            case 6:
+                rating += 3;
+                rating += (this.bluffAbility / 7) + 1;
+                break;
+            case 7:
+                rating += 4;
+                rating += (this.bluffAbility / 6) + 1;
+                break;
+            case 8:
+                rating += (this.bluffAbility / 5) + 1;
+            case 9:
+                rating += 8;
+                rating += (this.bluffAbility / 4) - 1;
+                break;
+        } 
 
         return rating;
     }
 
     private getRaiseRating(): number {
-        let rating = this.bluffAbility - this.riskAversion;
+        let rating = 0;
+
+        switch (this.myInfo.getHandType()) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                rating += 10;
+                rating += this.bluffAbility;
+                break;
+            case 4:
+                rating += this.bluffAbility - 1;
+            case 5:
+                rating += 9;
+                rating += this.bluffAbility - 1;
+                break;
+            case 6:
+                rating += 7;
+                rating += this.bluffAbility - 3;
+                break;
+            case 7:
+                rating += 6;
+                rating += this.bluffAbility - 4;
+                break;
+            case 8:
+                rating += 3;
+                rating += (this.bluffAbility / 4);
+                break;
+            case 9:
+                rating += 1;
+                rating += (this.bluffAbility / 8);
+                break;
+        } 
 
         return rating;
     }
 
     private getFoldRating(): number {
-        let rating = this.riskAversion - this.bluffAbility;
+        let rating = 0;
+
+        switch (this.myInfo.getHandType()) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                rating += this.bluffAbility / 10;
+            case 5:
+                rating += 1;
+                rating += this.bluffAbility / 9;
+                break;
+            case 6:
+                rating += 2;
+                rating += this.bluffAbility / 7;
+                break;
+            case 7:
+                rating += 3;
+                rating += this.bluffAbility / 6;
+                break;
+            case 8:
+                rating += 7;
+                rating += this.bluffAbility / 5;
+                break;
+            case 9:
+                rating += 9;
+                rating += this.bluffAbility / 4;
+                break;
+        } 
 
         return rating;
     }
 
     private getDiscardRating(): number {
-        if (this.gameInfo.getRoundNumber() == 1) {
+        if (this.gameInfo.getRoundNumber() != 1) {
             return 0;
         }
 
         let rating = 0;
 
-        let bluffAbility = this.bluffAbility;
-        let riskAversion = this.riskAversion;
-
-        if (this.myInfo.getHandType() > 8) {
-            rating = this.bluffAbility - this.riskAversion;
-        } else if (this.myInfo.getHandType() < 4) {
-            rating = this.riskAversion - this.bluffAbility;
+        if (this.myInfo.getHandType() < 7) {
+            rating = 11;
         }
 
         return rating;
@@ -106,16 +188,10 @@ export class AI implements IAI {
 
         let rating = 0;
 
-        let bluffAbility = this.bluffAbility;
-        let riskAversion = this.riskAversion;
-
-        if (this.myInfo.getHandType() > 8) {
-            rating = this.bluffAbility - this.riskAversion;
-        } else if (this.myInfo.getHandType() < 4) {
-            rating = this.riskAversion - this.bluffAbility;
+        if (this.myInfo.getHandType() > 7) {
+            rating = 10;
         }
 
         return rating;
     }
-
 }
