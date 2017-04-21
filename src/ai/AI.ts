@@ -70,24 +70,30 @@ export class AI implements IAI {
             case 2:
             case 3:
             case 4:
-                rating += (this.bluffAbility / 10) + 1;
+                rating += (this.bluffAbility / 10);
+                rating += (this.riskAversion / 10);
             case 5:
                 rating += 1;
                 rating += (this.bluffAbility / 9) + 1;
+                rating += (this.riskAversion / 10) + 1;
                 break;
             case 6:
                 rating += 3;
                 rating += (this.bluffAbility / 7) + 1;
+                rating += (this.riskAversion / 6) + 1;
                 break;
             case 7:
                 rating += 4;
                 rating += (this.bluffAbility / 6) + 1;
+                rating += (this.riskAversion / 5) + 1;
                 break;
             case 8:
                 rating += (this.bluffAbility / 5) + 1;
+                rating += (this.riskAversion / 2) + 1;
             case 9:
                 rating += 8;
                 rating += (this.bluffAbility / 4) - 1;
+                rating += (this.riskAversion - 1);
                 break;
         } 
 
@@ -104,28 +110,35 @@ export class AI implements IAI {
             case 3:
                 rating += 10;
                 rating += this.bluffAbility;
+                rating += this.riskAversion;
                 break;
             case 4:
                 rating += this.bluffAbility - 1;
+                rating += this.riskAversion - 2;
             case 5:
                 rating += 9;
                 rating += this.bluffAbility - 1;
+                rating += this.riskAversion - 2;
                 break;
             case 6:
                 rating += 7;
                 rating += this.bluffAbility - 3;
+                rating += this.riskAversion - 4;
                 break;
             case 7:
                 rating += 6;
                 rating += this.bluffAbility - 4;
+                rating += this.riskAversion - 5;
                 break;
             case 8:
                 rating += 3;
                 rating += (this.bluffAbility / 4);
+                rating += (this.riskAversion / 6);
                 break;
             case 9:
                 rating += 1;
                 rating += (this.bluffAbility / 8);
+                rating += (this.riskAversion / 10);
                 break;
         } 
 
@@ -142,25 +155,31 @@ export class AI implements IAI {
             case 3:
             case 4:
                 rating += this.bluffAbility / 10;
+                rating += this.riskAversion / 10;
             case 5:
                 rating += 1;
                 rating += this.bluffAbility / 9;
+                rating += this.riskAversion / 10;
                 break;
             case 6:
                 rating += 2;
                 rating += this.bluffAbility / 7;
+                rating += this.riskAversion / 6;
                 break;
             case 7:
                 rating += 3;
                 rating += this.bluffAbility / 6;
+                rating += this.riskAversion / 5;
                 break;
             case 8:
                 rating += 7;
                 rating += this.bluffAbility / 5;
+                rating += this.riskAversion / 2;
                 break;
             case 9:
                 rating += 9;
                 rating += this.bluffAbility / 4;
+                rating += this.riskAversion;
                 break;
         } 
 
