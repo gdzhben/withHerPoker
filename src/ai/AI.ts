@@ -1,4 +1,5 @@
 import { IAI } from './IAI';
+import { HandType } from '../types/HandType';
 
 export class AI implements IAI {
     private bluffAbility: number;
@@ -29,7 +30,7 @@ export class AI implements IAI {
     // bet = (hand rank / 10) * totalChips.
     // e.g. HighHand: (0 / 10) * totalChips = 0.
     private betAmount(): number {
-        let bet = this.myInfo.getHandType() * this.myInfo.totalChips();
+        let bet = (this.myInfo.getHandType() / HandType.HighHand)  * this.myInfo.totalChips();
 
         return bet;
     }
