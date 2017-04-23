@@ -3,5 +3,6 @@ export enum CommandType {
     Raise,
     Fold,
     Show,
+    Lose,
     Discard
 }

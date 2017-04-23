@@ -1,5 +1,6 @@
 import { IAI } from './IAI';
 import { HandType } from '../types/HandType';
+import { CommandType } from '../types/CommandType';
 
 export class AI implements IAI {
     private bluffAbility: number;
@@ -7,6 +8,7 @@ export class AI implements IAI {
     private gameInfo: any;
     private myInfo: any;
 
+    // TO-DO add values for field to constructor.
     constructor(gameInfo: any, myInfo: any) {
         this.bluffAbility = Math.floor((Math.random() * 10) + 1);
         this.riskAversion = Math.floor((Math.random() * 10) + 1);
@@ -16,9 +18,14 @@ export class AI implements IAI {
     }
 
     public yourTurn(dealer: any) {
+        let command = this.getTurnCommand();
+
+        if (command == HandType[this.gameInfo.getHandType()]) {
+            command += " " + this.betAmount();
+        }
 
         // Check if command is valid.
-        if (dealer.giveCommand()) {
+        if (dealer.giveCommand(command)) {
 
         } else {
 
@@ -27,12 +34,13 @@ export class AI implements IAI {
 
     // Argument for raise command.
     // Bet should be in proportion with hand rank.
-    // bet = (hand rank / 10) * totalChips.
-    // e.g. HighHand: (0 / 10) * totalChips = 0.
+    // bet = ((10 - hand rank) / 10) * totalChips.
+    // e.g. HighHand: (10 - 10 / 10) * totalChips = 0.
     private betAmount(): number {
-        let bet = (this.myInfo.getHandType() / HandType.HighHand)  * this.myInfo.totalChips();
+        let numOfHandConfigs = Object.keys(HandType).length / 2;
+        let bet = ((numOfHandConfigs - this.myInfo.getHandType()) / numOfHandConfigs) * this.myInfo.totalChips();
 
-        return bet;
+        return Math.floor(bet);
     }
 
     // Return string corresponding to command with highest rating.
@@ -187,31 +195,15 @@ export class AI implements IAI {
         return rating;
     }
 
-    private getDiscardRating(): number {
-        if (this.gameInfo.getRoundNumber() != 1) {
-            return 0;
-        }
-
-        let rating = 0;
-
-        if (this.myInfo.getHandType() < 7) {
-            rating = 11;
-        }
-
-        return rating;
+    public discard(dealer: any): void {
+        
     }
-
-    private getShowRating(): number {
-        if (this.gameInfo.getRoundNumber() == 1) {
-            return 0;
-        }
-
-        let rating = 0;
-
+    
+    public end(dealer: any): void {
         if (this.myInfo.getHandType() > 7) {
-            rating = 10;
+            dealer.giveCommand(CommandType[CommandType.Lose]);
+        } else {
+            dealer.giveCommand(CommandType[CommandType.Show]);
         }
-
-        return rating;
     }
 }
