@@ -8,13 +8,17 @@ app.start();
 var express: ex.Application = ex();
 
 express.listen(3000, () => {
-    console.log('Example app listening on port 3000!');
+    console.log('withHer Poker app listening on port 3000!');
 });
 
 
 let testConnectionString = 'mongodb://withHer:1234@localhost/test';
 var mongo = new MongoDb(testConnectionString);
 express.get('/leaderboard', (req, res) => {
-    let data = mongo.getLeaderboard(10);
-    res.send(data);
+    mongo.getLeaderboard(10).then((data) => {
+        res.send(data);
+    }).catch((error: Error) => {
+        res.statusCode = 500;
+        res.send(error);
+    })
 });
