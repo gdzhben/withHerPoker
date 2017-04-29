@@ -22,3 +22,7 @@ express.get('/leaderboard', (req, res) => {
         res.send(error);
     })
 });
+
+express.get('/', (req, res) => {
+    res.sendFile(__dirname.replace('/build', '') + '/src/leaderboard.html');
+});
