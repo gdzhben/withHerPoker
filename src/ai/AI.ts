@@ -9,9 +9,9 @@ export class AI implements IAI {
     private myInfo: any;
 
     // TO-DO add values for field to constructor.
-    constructor(gameInfo: any, myInfo: any) {
-        this.bluffAbility = Math.floor((Math.random() * 10) + 1);
-        this.riskAversion = Math.floor((Math.random() * 10) + 1);
+    constructor(gameInfo: any, myInfo: any, bluffAbility: number, riskAversion: number) {
+        this.bluffAbility = bluffAbility;
+        this.riskAversion = riskAversion;
         
         this.gameInfo = gameInfo;
         this.myInfo = myInfo;
