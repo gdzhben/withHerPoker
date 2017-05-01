@@ -4,7 +4,7 @@ import 'rxjs/add/operator/toPromise';
 
 import {
     IPlayer, IHand, CommandType, EndGameType, PlayerTools, MAX_CARDS_DISCARD,
-    SIZE_OF_HANDS, GameEndState, Message, IGameInfo
+    SIZE_OF_HANDS, GameEndState, Message, IGameInfo, GameOverState
 } from '../../interfaces';
 import { GamePlay } from '../game-play/GamePlay';
 
@@ -68,12 +68,22 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
+
+    public gameOver(game: GameOverState, money?: number): void {
+        if (game == GameOverState.Bust) {
+            this.tools.reply(Message.OTHER.BUST_MESSAGE);
+        } else {
+            this.tools.reply(`You won ${money} chips!`
+                + "\n" + Message.OTHER.WON_MESSAGE);
+        }
+    }
+
     private display(gameInfo: IGameInfo) {
         let count = 0;
         let str = '';
         _.forEachRight(gameInfo, (info) => {
             info.toString();
-            str = info.toString().concat(str + '\n');
+            str = info.toString().concat('\n' + str);
             count++;
             return count < 5;
         })
@@ -141,6 +151,12 @@ export class HumanPlayer implements IPlayer {
                 error = true;
             }
         })
+        let uniqueNos = _.uniq(nArr);
+
+        if (uniqueNos.length < nArr.length) {
+            this.tools.reply(Message.ERRORS.DUPLICATE_DISCARD_ERROR);
+            return undefined;
+        }
 
         if (nArr.length <= MAX_CARDS_DISCARD && !error) {
             return nArr;

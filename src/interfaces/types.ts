@@ -39,3 +39,8 @@ export enum GameEndState {
     Lost = 1,
     Won = 2
 }
+
+export enum GameOverState {
+    Won = 1,
+    Bust
+}

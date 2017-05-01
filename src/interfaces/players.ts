@@ -1,7 +1,7 @@
 import * as rx from 'rxjs/Rx';
 
 import { ICommand } from './commands';
-import { CommandType, GameEndState, EndGameType, PlayerState } from './types';
+import { CommandType, GameEndState, EndGameType, PlayerState, GameOverState } from './types';
 import { IPokerChip, IHand, ICard } from './poker-objects';
 
 export interface IPlayer {
@@ -11,6 +11,7 @@ export interface IPlayer {
     discard(gameInfo: IGameInfo): Promise<number[]>;
     showdown(gameInfo: IGameInfo): Promise<EndGameType>;
     endTurn(gameInfo: IGameInfo): Promise<boolean>;
+    gameOver(game: GameOverState, money?: number): void;
 }
 
 export interface IPlayerGame {

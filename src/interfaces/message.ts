@@ -7,7 +7,7 @@ export class Message {
     "First Round: FOLD, SEE or RAISE" + "\n" +
     "Second Round: comma or space separated index of your cards to discard (Max 3 indexes)" + "\n" +
     "Third Round: FOLD, SEE or RAISE" + "\n" +
-    "Fourth round: SHOW or FOLD" +
+    "Fourth round: SHOW or FOLD" + "\n" +
     "Winner will be declared" + "\n";
 
     public static readonly INSTRUCTION_MESSAGE_2: string =
@@ -23,7 +23,8 @@ export class Message {
         SHOWDOWN_COMMAND_ERROR: "Valid commands are show or fold!",
         PLAY_AGAIN_COMMAND_ERROR: "Valid commands are yes/y or no/n!",
         WAIT_FOR_SERVER_TO_PROCESS: "Wait for the server to respond!",
-        DEAL_ME_ERROR: "Enter dealme to play"
+        DEAL_ME_ERROR: "Enter dealme to play",
+        DUPLICATE_DISCARD_ERROR: "You cannot enter duplicate indexes!"
     }
 
     public static readonly QUESTION = {
@@ -33,8 +34,12 @@ export class Message {
         PLAY_AGAIN_COMMAND_QUESTION: "Would you like to play again?"
     }
 
-    public readonly OTHER = {
-        BUST_MESSAGE: "Sorry you are BUST! Game Over!",
-        WON_MESSAGE: "Congratulations! You won the game!"
+    public static readonly OTHER = {
+        BUST_MESSAGE: "Sorry you are BUST! Game Over!" + "\n" +
+        "To restart the game, enter dealme",
+        WON_MESSAGE: "Congratulations! You won the game!" + "\n" +
+        "To restart the game, enter dealme"
     }
+
+    public static readonly QUIT_GAME = "Game quitted! To restart the game, enter dealme!";
 }

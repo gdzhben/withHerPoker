@@ -36,6 +36,7 @@ export class GamePlay {
         } else {
             if (_.toLower(user.text) === "exit") {
                 _.unset(this.dealers, user.id);
+                this.twitterBot.sendDirectMessage(user.id, Message.QUIT_GAME);
             } else {
                 dealer.observable.next(user.text);
             }

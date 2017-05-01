@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import {
     IPlayer, IPlayerGame, START_MONEY, CommandType, RAISE_AMOUNT,
-    IPokerChip, EndGameType, ICard, Info
+    IPokerChip, EndGameType, ICard, Info, GameOverState
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip'
 import { GameState } from './GameState'
@@ -35,6 +35,7 @@ export class Dealer {
     }
 
     public play(): void {
+        this.log = new GameLog();
         this._gameState.dealPlayers();
         this.firstRound();
     }
@@ -73,6 +74,10 @@ export class Dealer {
                 result = this._gameState.checkAndSetBust(playerName);
                 if (!result) {
                     result = this._gameState.see(playerName);
+                } else {
+                    player.gameOver(GameOverState.Bust);
+                    this._gameState.removePlayer(playerName);
+                    _.unset(this._players, playerName);
                 }
             }
             this.log.log(result);
@@ -133,6 +138,10 @@ export class Dealer {
                 result = this._gameState.checkAndSetBust(playerName);
                 if (!result) {
                     result = this._gameState.see(playerName);
+                } else {
+                    player.gameOver(GameOverState.Bust);
+                    this._gameState.removePlayer(playerName);
+                    _.unset(this._players, playerName);
                 }
             }
             this.log.log(result);
@@ -168,13 +177,18 @@ export class Dealer {
         });
     }
 
-    private endTurnArray: string[] = [];
     private endRound() {
         let result = this._gameState.end();
         _.forEach(result, (elem) => {
             this.log.log(elem);
         });
-        this.endTurnArray = [];
+
+        if (result.length == 1) {
+            let info = result[0];
+            this._players[info.name].gameOver(GameOverState.Won, info.chipsLeft);
+            this._hasGameEnded = true;
+        }
+
         this.playAgain();
     }
 
@@ -188,8 +202,9 @@ export class Dealer {
         }
         player.endTurn(this.log.getLog()).then((command) => {
             let result: Info;
-            if (command) {
-                this.endTurnArray.push(playerName);
+            if (!command) {
+                this._gameState.removePlayer(playerName);
+                _.unset(this._players, playerName);
             }
             this.playAgain();
         }).catch((error) => {
@@ -198,21 +213,21 @@ export class Dealer {
     }
 
     private restart() {
-        if (this.endTurnArray.length >= 1) {
-            if (this._isThereHumanPlayer()) {
-            }
+        let players = this._gameState.getPlayers();
+        if (this._isThereHumanAndMorePlayers()) {
+            this.play();
         }
-        this._hasGameEnded = true;
     }
 
-    private _isThereHumanPlayer(): boolean {
+    private _isThereHumanAndMorePlayers(): boolean {
         let yes = false;
-        _.forEach(this.endTurnArray, (name) => {
+        let playerNames = this._gameState.getPlayers();
+        _.forEach(playerNames, (name) => {
             let player = this._players[name];
             if (player instanceof HumanPlayer) {
                 yes = true;
             }
         })
-        return yes;
+        return yes && playerNames.length > 1;
     }
 }

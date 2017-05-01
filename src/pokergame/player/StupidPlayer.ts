@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import {
-    IPlayer, IHand, CommandType, EndGameType, GameEndState,IGameInfo
+    IPlayer, IHand, CommandType, EndGameType, GameEndState, IGameInfo, GameOverState
 } from '../../interfaces';
 
 export class StupidPlayer implements IPlayer {
@@ -35,5 +35,9 @@ export class StupidPlayer implements IPlayer {
 
     public endTurn(gameInfo: IGameInfo): Promise<boolean> {
         return Promise.resolve(true);
+    }
+
+    public gameOver(game: GameOverState, money?: number): void {
+
     }
 }
