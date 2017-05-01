@@ -1,4 +1,5 @@
 export * from './interfaces/configs';
+export * from './interfaces/message';
 
 export * from './interfaces/mongodb';
 export * from './interfaces/twitter';

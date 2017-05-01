@@ -4,11 +4,9 @@ import 'rxjs/add/operator/toPromise';
 
 import {
     IPlayer, IHand, CommandType, EndGameType, PlayerTools, MAX_CARDS_DISCARD,
-    SIZE_OF_HANDS, GameEndState
+    SIZE_OF_HANDS, GameEndState, Message
 } from '../../interfaces';
 import { GamePlay } from '../game-play/GamePlay';
-import { TwitterBot } from '../../twitter-bot/TwitterBot';
-import { twitterConfig } from '../../twitter-bot/twitter-config';
 
 export class HumanPlayer implements IPlayer {
 
@@ -36,6 +34,56 @@ export class HumanPlayer implements IPlayer {
     public dealCards(hand: IHand): void {
         this._hand = hand;
     }
+
+    public betting(gameInfo: any): Promise<CommandType> {
+        return new Promise<CommandType>((resolve, reject) => {
+            this.tools.reply(Message.QUESTION.BETTING_COMMAND_QUESTION);
+            let type = this.validateBetting();
+            if (type) {
+                resolve(type);
+            } else {
+                this.resolveBetting = resolve;
+            }
+        });
+    }
+
+    public discard(gameInfo: any): Promise<number[]> {
+        return new Promise<number[]>((resolve, reject) => {
+            this.tools.reply(Message.QUESTION.DISCARD_COMMAND_QUESTION);
+            let type = this.validateDiscard();
+            if (type) {
+                resolve(type);
+            } else {
+                this.resolveDiscard = resolve;
+            }
+        });
+    }
+
+    public showdown(gameInfo: any): Promise<EndGameType> {
+        return new Promise<EndGameType>((resolve, reject) => {
+            this.tools.reply(Message.QUESTION.SHOWDOWN_COMMAND_QUESTION);
+            let type = this.validateShowdown();
+            if (type) {
+                resolve(type);
+            } else {
+                this.resolveShowdown = resolve;
+            }
+        });
+    }
+
+
+    public endTurn(gameInfo: any, endGameState: EndGameType): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.tools.reply(Message.QUESTION.PLAY_AGAIN_COMMAND_QUESTION);
+            let type = this.validateEnd();
+            if (type) {
+                resolve(type);
+            } else {
+                this.resolveEnd = resolve;
+            }
+        });
+    }
+
 
     private subscribe() {
         this.tools.observables.subscribe((text) => {
@@ -68,51 +116,6 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
-    public betting(gameInfo: any): Promise<CommandType> {
-        return new Promise<CommandType>((resolve, reject) => {
-            let type = this.validateBetting();
-            if (type) {
-                resolve(type);
-            } else {
-                this.resolveBetting = resolve;
-            }
-        });
-    }
-
-    public discard(gameInfo: any): Promise<number[]> {
-        return new Promise<number[]>((resolve, reject) => {
-            let type = this.validateDiscard();
-            if (type) {
-                resolve(type);
-            } else {
-                this.resolveDiscard = resolve;
-            }
-        });
-    }
-
-    public showdown(gameInfo: any): Promise<EndGameType> {
-        return new Promise<EndGameType>((resolve, reject) => {
-            let type = this.validateShowdown();
-            if (type) {
-                resolve(type);
-            } else {
-                this.resolveShowdown = resolve;
-            }
-        });
-    }
-
-
-    public endTurn(gameInfo: any, endGameState: EndGameType): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            let type = this.validateEnd();
-            if (type) {
-                resolve(type);
-            } else {
-                this.resolveEnd = resolve;
-            }
-        });
-    }
-
     private validateBetting(): CommandType {
         let msg = undefined;
         if (this.messages.length > 0) {
@@ -125,7 +128,7 @@ export class HumanPlayer implements IPlayer {
         } else if (msg === "fold") {
             return CommandType.Fold;
         }
-        this.tools.reply("Valid commands are see, raise, fold!");
+        this.tools.reply(Message.ERRORS.BETTING_COMMAND_ERROR);
         return undefined;
     }
 
@@ -155,7 +158,7 @@ export class HumanPlayer implements IPlayer {
         if (nArr.length < 3 && !error) {
             return nArr;
         }
-        this.tools.reply("Valid commands are (3 nos. inclusive between 0 and 4 separated by comma or space) or 'no'");
+        this.tools.reply(Message.ERRORS.DISCARD_COMMAND_ERROR);
         return undefined;
     }
 
@@ -171,7 +174,7 @@ export class HumanPlayer implements IPlayer {
             return EndGameType.Lose;
         }
 
-        this.tools.reply("Valid commands are show or fold!");
+        this.tools.reply(Message.ERRORS.SHOWDOWN_COMMAND_ERROR);
         return undefined;
     }
 
@@ -187,7 +190,7 @@ export class HumanPlayer implements IPlayer {
             return false;
         }
 
-        this.tools.reply("Valid commands are yes/y or no/n!");
+        this.tools.reply(Message.ERRORS.PLAY_AGAIN_COMMAND_ERROR);
         return undefined;
     }
 
