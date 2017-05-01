@@ -37,12 +37,14 @@ export class Dealer {
 
     private firstRound() {
         let player = this._gameState.getNextPlayer();
+        if (this._gameState.isGameOver()) {
+            this.endRound();
+            return;
+        }
         if (!player) {
             this._gameState.resetTurn();
-            if (this._gameState.isGameOver()) {
-                this.endRound();
-            }
             this.secondRound();
+            return;
         }
         player.betting(this._gameLogger.getLog()).then((command) => {
             if (command == CommandType.Fold) {
@@ -56,6 +58,7 @@ export class Dealer {
                     this._gameState.see(player);
                 }
             }
+            this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
             this._gameLogger.addFirstRound(player.getName(), command);
             this.firstRound();
         }).catch((error) => {
@@ -65,12 +68,14 @@ export class Dealer {
 
     private secondRound() {
         let player = this._gameState.getNextPlayer();
+        if (this._gameState.isGameOver()) {
+            this.endRound();
+            return;
+        }
         if (!player) {
             this._gameState.resetTurn();
-            if (this._gameState.isGameOver()) {
-                this.endRound();
-            }
             this.thirdRound();
+            return;
         }
         player.discard(this._gameLogger.getLog()).then((command) => {
             this._gameState.discard(player, command);
@@ -84,12 +89,14 @@ export class Dealer {
 
     private thirdRound() {
         let player = this._gameState.getNextPlayer();
+        if (this._gameState.isGameOver()) {
+            this.endRound();
+            return;
+        }
         if (!player) {
             this._gameState.resetTurn();
-            if (this._gameState.isGameOver()) {
-                this.endRound();
-            }
             this.showdownRound();
+            return;
         }
         player.betting(this._gameLogger.getLog()).then((command) => {
             if (command == CommandType.Fold) {
@@ -103,6 +110,7 @@ export class Dealer {
                     this._gameState.see(player);
                 }
             }
+            this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
             this._gameLogger.addThirdRound(player.getName(), command);
             this.thirdRound();
         }).catch((error) => {
@@ -112,19 +120,23 @@ export class Dealer {
 
     private showdownRound() {
         let player = this._gameState.getNextPlayer();
+        if (this._gameState.isGameOver()) {
+            this.endRound();
+            return;
+        }
         if (!player) {
             this._gameState.resetTurn();
-            if (this._gameState.isGameOver()) {
-                this.endRound();
-            }
             this.endRound();
+            return;
         }
         player.showdown(this._gameLogger.getLog()).then((command) => {
             let cards: ICard[] = [];
             if (command == EndGameType.Lose) {
                 this._gameState.fold(player);
+                player.endTurn(this._gameLogger.getLog(), EndGameType.Lose);
             } else if (command == EndGameType.Show) {
                 cards = this._gameState.showCards(player);
+                this._gameState.playerPushCardsToCheckWon(player);
             }
             this._gameLogger.addFourthRound(player.getName(), command, cards);
             this.firstRound();
@@ -134,8 +146,8 @@ export class Dealer {
     }
 
     private endRound() {
-
-        
-
+        let player = this._gameState.getWon();
+        this._gameState.won(player);
+        this._gameLogger.finishRound();
     }
 }

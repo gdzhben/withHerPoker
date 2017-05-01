@@ -8,6 +8,7 @@ import {
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip';
 import { DeckFactory } from '../poker-objects/DeckFactory';
+import { HandWinner } from '../poker-objects/HandWinner';
 import { Deck } from '../poker-objects/Deck';
 import { Hand } from '../poker-objects/Hand';
 import { Decks } from '../poker-objects/Decks';
@@ -22,7 +23,7 @@ export class GameState {
     private _currentBet: IPokerChip;
 
     private _players: IPlayerGame[] = [];
-
+    private tempWinningHand: IPlayerGame;
     constructor(players: IPlayer[]) {
         this._deck = new Decks(DeckFactory.createStandardCards());
 
@@ -45,7 +46,7 @@ export class GameState {
     public dealPlayers() {
         this._deck.reset();
         this._deck.shuffle();
-
+        this.tempWinningHand = undefined;
         _.forEach(this._players, (user) => {
             let dealtCards = this._deck.dealCard(SIZE_OF_HANDS);
             user.hand = new Hand(dealtCards);
@@ -93,6 +94,28 @@ export class GameState {
         let playerGame = this._findUserPlaying(player);
         playerGame.wallet = playerGame.wallet.add(this._pool);
         this._pool = new PokerChip();
+    }
+    public playerPushCardsToCheckWon(player: IPlayer) {
+        let playerGame = this._findUserPlaying(player);
+        if (!this.tempWinningHand) {
+            this.tempWinningHand = playerGame;
+        } else {
+            let handWinner = new HandWinner(this.tempWinningHand.hand, playerGame.hand);
+            if (!handWinner.getWinner()) {
+                this.tempWinningHand.status = PlayerState.Fold;
+                this.tempWinningHand = playerGame;
+            }
+        }
+    }
+
+    public getWon() {
+        let playersPlaying = _.filter(this._players, (player) => {
+            return player.status == PlayerState.Playing;
+        });
+        if (!(playersPlaying.length == 1)) {
+            throw new Error('Error game didnot finish!');
+        }
+        return playersPlaying[0].player;
     }
 
     public getPlayers(): IPlayer[] {

@@ -102,7 +102,7 @@ export class HumanPlayer implements IPlayer {
     }
 
 
-    public endTurn(gameInfo: any, endGameState: GameEndState): Promise<boolean> {
+    public endTurn(gameInfo: any, endGameState: EndGameType): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             let type = this.validateEnd();
             if (type) {

@@ -10,7 +10,7 @@ export interface IPlayer {
     betting(gameInfo: any): Promise<CommandType>;
     discard(gameInfo: any): Promise<number[]>;
     showdown(gameInfo: any): Promise<EndGameType>;
-    endTurn(gameInfo: any, endGameState: GameEndState): Promise<boolean>;
+    endTurn(gameInfo: any, endGameState: EndGameType): Promise<boolean>;
 }
 
 export interface IPlayerGame {
