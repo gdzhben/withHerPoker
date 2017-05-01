@@ -1,28 +1,29 @@
 export class Message {
-    public static readonly WELCOME_MESSAGE: string = "Warm welcome to playing poker withHer.";
+    public static readonly WELCOME_MESSAGE: string = "Warm welcome to playing poker withHer!";
 
     public static readonly INSTRUCTION_MESSAGE: string =
-    `You will be playing this poker game with 4 other bot player.\n
-    At the start of the game you will all be given amount of 100 game chips to bet.
-    In the first round you will have the option to either FOLD, SEE or RAISE.
-    Then you can choose to whether you want to discard some of your cards.\n
-    The maximum number of cards you can discard is 3.\n
-    Then in the second round you can again choose to  FOLD, SEE or RAISE.
-    Following by 3rd round, everyone have to show their cards or fold and the game will announce the winner.
-    Then move to next round.`;
+    "You will be playing this poker game with 4 other bot player." + "\n" +
+    "You will start with 100 Poker chips." + "\n" +
+    "First Round: FOLD, SEE or RAISE" + "\n" +
+    "Second Round: comma or space separated index of your cards to discard (Max 3 indexes)" + "\n" +
+    "Third Round: FOLD, SEE or RAISE" + "\n" +
+    "Fourth round: SHOW or FOLD" +
+    "Winner will be declared" + "\n";
 
     public static readonly INSTRUCTION_MESSAGE_2: string =
-    `In the case of a bot player runing out of poker chips it will not able to make to the next round.
-     remaining player will continue the game to next round. 
-     But if the human player runing out of chips. 
-     Game will be over.`;
+    "To quit the game any time: QUIT" + "\n" +
+    "To play the game: DEALME" + "\n" +
+    "In the case of a bot player runing out of poker chips it will not able to make to the next round." + "\n" +
+    "Remaining player will continue the game to next round." + "\n" +
+    "But if the human player runing out of chips. Game will be over.";
 
     public static readonly ERRORS = {
         BETTING_COMMAND_ERROR: "Your input to the game was invalid. Your input should be as following: see raise fold!",
         DISCARD_COMMAND_ERROR: "Valid commands are (3 nos. inclusive between 0 and 4 separated by comma or space) or 'no'",
         SHOWDOWN_COMMAND_ERROR: "Valid commands are show or fold!",
         PLAY_AGAIN_COMMAND_ERROR: "Valid commands are yes/y or no/n!",
-        WAIT_FOR_SERVER_TO_PROCESS: "Wait for the server to respond!"
+        WAIT_FOR_SERVER_TO_PROCESS: "Wait for the server to respond!",
+        DEAL_ME_ERROR: "Enter dealme to play"
     }
 
     public static readonly QUESTION = {

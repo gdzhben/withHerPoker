@@ -48,23 +48,7 @@ describe('Card', () => {
     });
 
     describe('equals', () => {
-
-        it('when args is string and is equal should return true', () => {
-            let otherCard = 'kc';
-
-            let result = test.equals(otherCard);
-
-            expect(result).toBeTruthy();
-        });
-
-        it('when args is string and is not equal should return false', () => {
-            let otherCard = 'KD';
-
-            let result = test.equals(otherCard);
-
-            expect(result).toBeFalsy();
-        });
-
+        
         it('when args is card and is equal should return true', () => {
             let otherCard = new Card(testSuit, testFace);
 

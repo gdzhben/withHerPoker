@@ -1,69 +1,78 @@
 import * as _ from 'lodash';
 
-import { SuitType } from '../../interfaces';
+import {
+    SuitType
+} from '../../interfaces';
 import { Deck } from "./Deck";
-import { DeckFactory } from './DeckFactory';
+import { Card } from "./Card";
 
 describe('Deck', () => {
 
-    let test: Deck;
+    let deck: Deck;
+    let cards: Card[];
 
     beforeEach(() => {
-        test = new Deck(DeckFactory.createStandardCards());
+        cards = [
+            new Card(SuitType.Clubs, 10),
+            new Card(SuitType.Diamonds, 10),
+            new Card(SuitType.Diamonds, 9),
+            new Card(SuitType.Clubs, 8),
+            new Card(SuitType.Hearts, 7)
+        ];
+        deck = new Deck(cards);
     });
 
     describe('shuffle', () => {
 
-        it('after shuffle deck size should still be 52', () => {
-            test.shuffle();
+        it('after shuffle deck size should still be the same', () => {
+            deck.shuffle();
 
-            let result = test.sizeOfDeck();
-            expect(result).toBe(52);
+            let result = deck.cardsLeft();
+            expect(result).toBe(cards.length);
         });
     });
 
-    describe('sizeOfDeck', () => {
+    describe('cardsLeft', () => {
 
-        it('after we draw a card the size of deck should be 51 instead of 52', () => {
-            let card = test.drawCard();
+        it('after we draw a card the size of deck should be one less', () => {
+            let card = deck.dealCard();
 
-            let result = test.sizeOfDeck();
+            let result = deck.cardsLeft();
 
-            expect(result).toBe(51);
+            expect(result).toBe(cards.length - card.length);
         });
     });
 
-    describe('drawCard', () => {
+    describe('dealCard', () => {
 
-        it('after we draw a card the size of deck should be 51 instead of 52', () => {
-            let card = test.drawCard();
+        it('after we draw a card the size of deck should be less', () => {
+            let card = deck.dealCard(2);
 
-            let result = test.sizeOfDeck();
-            expect(result).toBe(51);
+            let result = deck.cardsLeft();
+            expect(result).toBe(cards.length - card.length);
         });
     });
 
     describe('returnCard ', () => {
 
         it('after discard a card the card that been discarded should be in deck again', () => {
-            let card = test.drawCard();
+            let card = deck.dealCard();
 
-            test.returnCard(card);
+            deck.returnCard(card[0]);
 
-            let result = test.containCard(card);
-            expect(result).toBe(true);
+            let result = deck.hasCard(card[0]);
+            expect(result).toBeTruthy();
         });
     });
 
-    describe('containCard ', () => {
+    describe('hasCard ', () => {
 
-        it('after discard a card the card that been discarded should be in deck again', () => {
-            let card = test.drawCard();
-            test.returnCard(card);
+        it('hasCard shoudld return false if card not present', () => {
+            let card = deck.dealCard();
 
-            let result = test.containCard(card);
+            let result = deck.hasCard(card[0]);
 
-            expect(result).toBe(true);
+            expect(result).toBeFalsy();
         });
     });
 });

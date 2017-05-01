@@ -6,7 +6,7 @@ export enum CommandType {
 
 export enum EndGameType {
     Show = 1,
-    Lose
+    Fold
 }
 
 export enum HandType {
@@ -37,6 +37,5 @@ export enum PlayerState {
 
 export enum GameEndState {
     Lost = 1,
-    Won = 2,
-    Fold = 3
+    Won = 2
 }

@@ -1,43 +1,68 @@
 import * as _ from 'lodash';
 
 import { SuitType, IDeck, ICard } from '../../interfaces';
-import { Card } from './Card'
 
 export class Deck implements IDeck {
 
-    private _deckOfCards: ICard[] = [];
+    private _deck: ICard[];
+    private _discarded: ICard[];
 
     constructor(cards: ICard[]) {
-        if (cards) {
-            this._deckOfCards = _.slice(cards);
-        }
+        this._deck = _.slice(cards) || [];
+        this._discarded = [];
     }
 
     public shuffle(): void {
-        this._deckOfCards = _.shuffle(this._deckOfCards);
+        this._deck = _.shuffle(this._deck);
     }
 
-    public drawCard(): ICard {
-        if (!_.isEmpty(this._deckOfCards)) {
-            return this._deckOfCards.pop();
-        } else {
-            throw new Error('No card left to draw!');
+    public dealCard(noOfCards: number = 1): ICard[] {
+        if (noOfCards < 1) {
+            throw new Error("No of cards to be dealt cannot be less than 1");
+        } else if (noOfCards > this._deck.length) {
+            throw new Error("No of cards to be dealt cannot be greater than the size of the deck");
         }
-    }
-
-    public sizeOfDeck(): number {
-        return _.size(this._deckOfCards);
+        return _.times(noOfCards, () => {
+            return this._deck.pop();
+        });
     }
 
     public returnCard(card: ICard): void {
-        this._deckOfCards.push(card);
+        if (this._isInDeck(card)) {
+            throw new Error('The card is already in the deck!');
+        } else if (this._isInDiscarded(card)) {
+            throw new Error('The card has already been discarded');
+        }
+        this._discarded.push(card);
     }
 
-    public containCard(card: ICard): boolean {
-        let elem = _.find(this._deckOfCards, (elem: ICard) => {
-            return elem.equals(card);
+    public reset() {
+        _.times(this._discarded.length, () => {
+            let card = this._discarded.pop();
+            this._deck.push(card);
         });
+        this._deck = _.shuffle(this._deck);
+    }
 
-        return _.isObject(elem);
+    public cardsLeft() {
+        return this._deck.length;
+    }
+
+    public hasCard(card: ICard): boolean {
+        return this._isInDeck(card) || this._isInDiscarded(card);
+    }
+
+    private _isInDeck(card: ICard): boolean {
+        let index = _.findIndex(this._deck, (c) => {
+            return c.equals(card);
+        })
+        return index != -1;
+    }
+
+    private _isInDiscarded(card: ICard): boolean {
+        let index = _.findIndex(this._discarded, (c) => {
+            return c.equals(card);
+        })
+        return index != -1;
     }
 }

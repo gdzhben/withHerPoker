@@ -2,46 +2,58 @@ import * as _ from 'lodash';
 import * as rx from 'rxjs/Rx';
 
 import {
-    IPlayer, IUserMessage, ITwitterBot
+    IPlayer, IUserMessage, ITwitterBot, Message
 } from '../../interfaces';
 import { Dealer } from './Dealer';
-import { HumanPlayer } from '../player/HumanPlayer';
-import { StupidPlayer } from '../player/StupidPlayer';
+import { PlayerGenerator } from '../player/PlayerGenerator'
 
 export class GamePlay {
 
-    private dealers: Dealer[] = [];
-    private players: {
-        [key: string]: rx.Subject<string>
+    private dealers: {
+        [key: string]: {
+            observable: rx.Subject<string>,
+            dealer: Dealer
+        }
     } = {};
 
     constructor(private twitterBot: ITwitterBot) {
-
     }
 
     public recievedMessage(user: IUserMessage) {
-        let observable = this.players[user.id];
-        if (!observable) {
-            this.players[user.id] = new rx.Subject<string>();
-            let dealer = new Dealer(this.createPlayers(user.id));
-            this.dealers.push(dealer);
-            dealer.play();
+        let dealer = this.dealers[user.id];
+        if (!dealer && _.toLower(user.text) === "dealme") {
+            this.dealers[user.id] = {
+                observable: new rx.Subject<string>(),
+                dealer: undefined
+            };
+            dealer = this.dealers[user.id];
+
+            let players = this.createPlayers(user.id, user.screenName);
+            dealer.dealer = new Dealer(players);
+            dealer.dealer.play();
+        } else if (!dealer && _.toLower(user.text) !== "dealme") {
+            this.twitterBot.sendDirectMessage(user.id, Message.ERRORS.DEAL_ME_ERROR);
         } else {
-            observable.next(user.text);
+            if (_.toLower(user.text) === "exit") {
+                _.unset(this.dealers, user.id);
+            } else {
+                dealer.observable.next(user.text);
+            }
         }
     }
 
-    private createPlayers(id: string): IPlayer[] {
+    private createPlayers(id: string, name: string): IPlayer[] {
         let arr: IPlayer[];
         arr = _.times(4, (index) => {
-            return new StupidPlayer('XYZ' + index);
+            return PlayerGenerator.createStupidPlayer('XYZ' + index);
         })
-        arr.push(new HumanPlayer(id, {
-            observables: this.players[id],
+        let tools = {
+            observables: this.dealers[id].observable,
             reply: (text: string) => {
                 this.twitterBot.sendDirectMessage(id, text);
             }
-        }));
+        };
+        arr.push(PlayerGenerator.createHumanPlayer(name, tools));
         return arr;
     }
 }

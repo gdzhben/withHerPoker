@@ -34,11 +34,7 @@ export class Card implements ICard {
         return _.join([this._cardType, SuitType[this._suitType].substr(0, 1)], '');
     }
 
-    public equals(card: string | ICard): boolean {
-        if (_.isString(card)) {
-            return _.isEqual(_.toLower(card), _.toLower(this.toShortString()));
-        } else {
-            return _.isEqual(card.toShortString(), this.toShortString());
-        }
+    public equals(card: ICard): boolean {
+        return _.isEqual(card.toShortString(), this.toShortString());
     }
 }

@@ -12,6 +12,7 @@ export class App implements IApp {
 
     public gamePlay: GamePlay;
     private bot: ITwitterBot & IApp & ITwitterStream;
+
     private directMessageSubscription: rx.Subscription;
     private followSubscription: rx.Subscription;
 
@@ -26,12 +27,14 @@ export class App implements IApp {
 
     public stop(): void {
         this.bot.stop();
+        this.directMessageSubscription && this.directMessageSubscription.unsubscribe();
+        this.followSubscription && this.followSubscription.unsubscribe();
     }
 
     public subscribeDirectMessage(): void {
         this.bot.directMessagesObservable().subscribe((user) => {
-            this.gamePlay.recievedMessage(user);
             console.log('Message Recieved');
+            this.gamePlay.recievedMessage(user);
         }).add((error: Error) => {
             console.log(error);
         });
@@ -40,9 +43,18 @@ export class App implements IApp {
     public subscribeFollow(): void {
         this.bot.followObservable().subscribe((user) => {
             console.log('Follow Recieved');
-            this.bot.sendDirectMessage(user.id, Message.WELCOME_MESSAGE);
-            this.bot.sendDirectMessage(user.id, Message.INSTRUCTION_MESSAGE);
-            this.bot.sendDirectMessage(user.id, Message.INSTRUCTION_MESSAGE_2);
+
+            this.bot.createFriendship(user.id).then(() => {
+                console.log('User followed!');
+            });
+
+            this.bot.sendDirectMessage(user.id, Message.WELCOME_MESSAGE).then(() => {
+                this.bot.sendDirectMessage(user.id, Message.INSTRUCTION_MESSAGE).then(() => {
+                    this.bot.sendDirectMessage(user.id, Message.INSTRUCTION_MESSAGE_2).then(() => {
+                        console.log('Welcome Message sent!');
+                    })
+                })
+            });
         }).add((error: Error) => {
             console.log(error);
         });

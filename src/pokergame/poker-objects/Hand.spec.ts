@@ -7,6 +7,10 @@ describe('Hand', function () {
 
     let testHand: Hand;
     let testCardArray: ICard[];
+    let handToolStub: any = {
+        getHandType: jasmine.createSpy('getHandType'),
+        getGameValue: jasmine.createSpy('getGameValue')
+    }
 
     beforeEach(() => {
         testCardArray = [];
@@ -15,7 +19,7 @@ describe('Hand', function () {
         testCardArray.push(new Card(SuitType.Diamonds, 6));
         testCardArray.push(new Card(SuitType.Diamonds, 5));
         testCardArray.push(new Card(SuitType.Diamonds, 10));
-        testHand = new Hand(testCardArray);
+        testHand = new Hand(testCardArray, handToolStub);
     });
 
     describe('size', () => {

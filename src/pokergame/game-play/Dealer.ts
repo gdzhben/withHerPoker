@@ -2,40 +2,50 @@ import * as _ from 'lodash';
 
 import {
     IPlayer, IPlayerGame, START_MONEY, CommandType, RAISE_AMOUNT,
-    IPokerChip, EndGameType, ICard
+    IPokerChip, EndGameType, ICard, Info
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip'
 import { GameState } from './GameState'
-import { GameLogger } from './GameLogger'
+import { GameLog } from './GameLog'
 
 export class Dealer {
 
     private _gameState: GameState;
-    private _players: IPlayer[] = [];
-    private _gameLogger: GameLogger = new GameLogger();
+    private _players: {
+        [key: string]: IPlayer
+    } = {};
+    private log: GameLog = new GameLog();
+    private _hasGameEnded = false;
 
     constructor(players: IPlayer[]) {
         if (players && players.length !== 5) {
             throw new Error("must have 5 players in order to play.");
         }
-        this._gameState = new GameState(players);
+
+        let playerNames = _.map(players, (player) => {
+            return player.getName();
+        });
+        this._gameState = new GameState(playerNames);
+
+        this._players = {};
+        _.forEach(players, (player) => {
+            this._players[player.getName()] = player;
+        });
     }
 
     public play(): void {
-        this.orderOfPlayers();
         this._gameState.dealPlayers();
         this.firstRound();
     }
 
-    private orderOfPlayers() {
-        let order = _.map(this._players, (player) => {
-            return player.getName();
-        });
-        this._gameLogger.setOrder(order);
+    public hasGameEnded(): boolean {
+        return this._hasGameEnded;
     }
 
     private firstRound() {
-        let player = this._gameState.getNextPlayer();
+        let playerName = this._gameState.getNextPlayer();
+        let player = this._players[playerName];
+
         if (this._gameState.isGameOver()) {
             this.endRound();
             return;
@@ -45,22 +55,26 @@ export class Dealer {
             this.secondRound();
             return;
         }
+        
+        let playerGame = this._gameState.getPlayerGame(playerName);
+        player.dealCards(playerGame.hand);
 
-        this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
-        player.betting(this._gameLogger.getLog()).then((command) => {
+        player.betting(this.log.getLog()).then((command) => {
+            let result: Info;
             if (command == CommandType.Fold) {
-                this._gameState.fold(player);
+                result = this._gameState.fold(playerName);
             } else if (command == CommandType.Raise) {
-                if (!this._gameState.checkAndSetBust(player)) {
-                    this._gameState.raise(player);
+                result = this._gameState.checkAndSetBust(playerName);
+                if (!result) {
+                    result = this._gameState.raise(playerName);
                 }
             } else if (command == CommandType.See) {
-                if (!this._gameState.checkAndSetBust(player)) {
-                    this._gameState.see(player);
+                result = this._gameState.checkAndSetBust(playerName);
+                if (!result) {
+                    result = this._gameState.see(playerName);
                 }
             }
-            this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
-            this._gameLogger.addFirstRound(player.getName(), command);
+            this.log.log(result);
             this.firstRound();
         }).catch((error) => {
             console.log(error);
@@ -68,7 +82,7 @@ export class Dealer {
     }
 
     private secondRound() {
-        let player = this._gameState.getNextPlayer();
+        let playerName = this._gameState.getNextPlayer(); let player = this._players[playerName];
         if (this._gameState.isGameOver()) {
             this.endRound();
             return;
@@ -78,9 +92,10 @@ export class Dealer {
             this.thirdRound();
             return;
         }
-        player.discard(this._gameLogger.getLog()).then((command) => {
-            this._gameState.discard(player, command);
-            this._gameLogger.addSecondRound(player.getName(), command.length);
+        player.discard(this.log.getLog()).then((command) => {
+            let result: Info;
+            result = this._gameState.discard(playerName, command);
+            this.log.log(result);
             this.secondRound();
         }).catch((error) => {
             console.log(error);
@@ -89,7 +104,8 @@ export class Dealer {
 
 
     private thirdRound() {
-        let player = this._gameState.getNextPlayer();
+        let playerName = this._gameState.getNextPlayer();
+        let player = this._players[playerName];
         if (this._gameState.isGameOver()) {
             this.endRound();
             return;
@@ -99,20 +115,22 @@ export class Dealer {
             this.showdownRound();
             return;
         }
-        player.betting(this._gameLogger.getLog()).then((command) => {
+        player.betting(this.log.getLog()).then((command) => {
+            let result: Info;
             if (command == CommandType.Fold) {
-                this._gameState.fold(player);
+                result = this._gameState.fold(playerName);
             } else if (command == CommandType.Raise) {
-                if (!this._gameState.checkAndSetBust(player)) {
-                    this._gameState.raise(player);
+                result = this._gameState.checkAndSetBust(playerName);
+                if (!result) {
+                    result = this._gameState.raise(playerName);
                 }
             } else if (command == CommandType.See) {
-                if (!this._gameState.checkAndSetBust(player)) {
-                    this._gameState.see(player);
+                result = this._gameState.checkAndSetBust(playerName);
+                if (!result) {
+                    result = this._gameState.see(playerName);
                 }
             }
-            this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
-            this._gameLogger.addThirdRound(player.getName(), command);
+            this.log.log(result);
             this.thirdRound();
         }).catch((error) => {
             console.log(error);
@@ -120,7 +138,8 @@ export class Dealer {
     }
 
     private showdownRound() {
-        let player = this._gameState.getNextPlayer();
+        let playerName = this._gameState.getNextPlayer();
+        let player = this._players[playerName];
         if (this._gameState.isGameOver()) {
             this.endRound();
             return;
@@ -130,16 +149,14 @@ export class Dealer {
             this.endRound();
             return;
         }
-        player.showdown(this._gameLogger.getLog()).then((command) => {
-            let cards: ICard[] = [];
-            if (command == EndGameType.Lose) {
-                this._gameState.fold(player);
-                player.endTurn(this._gameLogger.getLog(), EndGameType.Lose);
+        player.showdown(this.log.getLog()).then((command) => {
+            let result: Info;
+            if (command == EndGameType.Fold) {
+                result = this._gameState.fold(playerName);
             } else if (command == EndGameType.Show) {
-                cards = this._gameState.showCards(player);
-                this._gameState.playerPushCardsToCheckWon(player);
+                result = this._gameState.show(playerName);
             }
-            this._gameLogger.addFourthRound(player.getName(), command, cards);
+            this.log.log(result);
             this.showdownRound();
         }).catch((error) => {
             console.log(error);
@@ -147,8 +164,14 @@ export class Dealer {
     }
 
     private endRound() {
-        let player = this._gameState.getWon();
-        this._gameState.won(player);
-        this._gameLogger.finishRound();
+        let result = this._gameState.end();
+        _.forEach(result, (elem) => {
+            this.log.log(elem);
+        });
+        this.playAgain();
+    }
+
+    private playAgain() {
+
     }
 }

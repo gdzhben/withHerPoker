@@ -38,7 +38,7 @@ export class HumanPlayer implements IPlayer {
 
     public betting(gameInfo: IGameInfo): Promise<CommandType> {
         return new Promise<CommandType>((resolve, reject) => {
-            this.tools.reply(gameInfo.toString(1));
+            this.display(gameInfo);
             this.tools.reply(Message.QUESTION.BETTING_COMMAND_QUESTION);
             this.resolveBetting = resolve;
         });
@@ -46,7 +46,7 @@ export class HumanPlayer implements IPlayer {
 
     public discard(gameInfo: IGameInfo): Promise<number[]> {
         return new Promise<number[]>((resolve, reject) => {
-            this.tools.reply(gameInfo.toString(2));
+            this.display(gameInfo);
             this.tools.reply(Message.QUESTION.DISCARD_COMMAND_QUESTION);
             this.resolveDiscard = resolve;
         });
@@ -54,17 +54,29 @@ export class HumanPlayer implements IPlayer {
 
     public showdown(gameInfo: IGameInfo): Promise<EndGameType> {
         return new Promise<EndGameType>((resolve, reject) => {
-            this.tools.reply(gameInfo.toString(3));
+            this.display(gameInfo);
             this.tools.reply(Message.QUESTION.SHOWDOWN_COMMAND_QUESTION);
             this.resolveShowdown = resolve;
         });
     }
 
-    public endTurn(gameInfo: IGameInfo, endGameState: EndGameType): Promise<boolean> {
+    public endTurn(gameInfo: IGameInfo): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             this.tools.reply(Message.QUESTION.PLAY_AGAIN_COMMAND_QUESTION);
             this.resolveEnd = resolve;
         });
+    }
+
+    private display(gameInfo: IGameInfo) {
+        let count = 0;
+        let str = '';
+        _.forEach(gameInfo, (info) => {
+            info.toString();
+            str = str.concat(info.toString() + '\n');
+            count++;
+            return count < 5;
+        })
+        this.tools.reply(str);
     }
 
     private subscribe() {
@@ -140,7 +152,7 @@ export class HumanPlayer implements IPlayer {
         if (msg === "show") {
             return EndGameType.Show;
         } else if (msg === "fold") {
-            return EndGameType.Lose;
+            return EndGameType.Fold;
         }
 
         this.tools.reply(Message.ERRORS.SHOWDOWN_COMMAND_ERROR);

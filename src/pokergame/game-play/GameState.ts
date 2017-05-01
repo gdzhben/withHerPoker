@@ -3,160 +3,194 @@ import * as _ from 'lodash';
 import {
     SuitType, CommandType, ICard, IDeck, IPlayer, ICommand,
     IPokerChip, IHand, SIZE_OF_HANDS, GameEndState, START_MONEY,
-    IPlayerGame, RAISE_AMOUNT, IBettingRound, IDiscardingRound, IShowdownRound,
+    RAISE_AMOUNT, Bust, Discard, End, Fold, Raise, See, Show,
     PlayerState, START_BET
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip';
 import { DeckFactory } from '../poker-objects/DeckFactory';
-import { HandWinner } from '../poker-objects/HandWinner';
+import { HandTool } from '../poker-objects/HandTool';
 import { Deck } from '../poker-objects/Deck';
 import { Hand } from '../poker-objects/Hand';
-import { Decks } from '../poker-objects/Decks';
+
+interface IPlayerGame {
+    name: string
+    wallet: IPokerChip,
+    hand: IHand,
+    status: PlayerState,
+}
 
 export class GameState {
-    private _startDate: Date = new Date();
-    private _noOfGames: number = 1;
+    private _startDate: Date;
+    private _noOfGames: number;
+    private handTool: HandTool = new HandTool();
 
-    private _deck: Decks;
+    private _deck: Deck;
 
     private _pool: IPokerChip;
     private _currentBet: IPokerChip;
 
-    private _players: IPlayerGame[] = [];
-    private tempWinningHand: IPlayerGame;
-    constructor(players: IPlayer[]) {
-        this._deck = new Decks(DeckFactory.createStandardCards());
+    private _players: {
+        [key: string]: IPlayerGame
+    } = {};
+    private _playerNames: string[] = [];
 
-        this._pool = new PokerChip();
-        this._currentBet = new PokerChip(START_BET);
+    constructor(names: string[]) {
         this._startDate = new Date();
+        this._noOfGames = 0;
 
-        _.forEach(players, (player) => {
+        let cards = DeckFactory.createStandardCards();
+        this._deck = new Deck(cards);
+
+        this._players = {};
+        _.forEach(names, (name) => {
             let user: IPlayerGame = {
-                player: player,
+                name: name,
                 wallet: new PokerChip(START_MONEY),
-                noDiscardedCard: 0,
                 hand: undefined,
                 status: PlayerState.Playing
             }
-            this._players.push(user);
+            if (this._players[name]) {
+                throw new Error('Names of the players must be unique.');
+            }
+            this._players[name] = user;
         });
+        this._playerNames = _.slice(names);
     }
 
     public dealPlayers() {
+        this._pool = new PokerChip();
+        this._currentBet = new PokerChip(START_BET);
+
         this._deck.reset();
         this._deck.shuffle();
-        this.tempWinningHand = undefined;
-        this._currentBet = new PokerChip(START_BET);
-        
         _.forEach(this._players, (user) => {
             let dealtCards = this._deck.dealCard(SIZE_OF_HANDS);
-            user.hand = new Hand(dealtCards);
-            user.noDiscardedCard = 0;
-            user.player.dealCards(user.hand);
+            user.hand = new Hand(dealtCards, new HandTool());
             user.status = PlayerState.Playing;
         });
+
         this._noOfGames++;
     }
 
-    public discard(player: IPlayer, cardIndexes: number[]) {
-        let user = this._findUserPlaying(player);
+    public discard(name: string, cardIndexes: number[]) {
+        let player = this._players[name];
+
         _.forEach(cardIndexes, (cardIndex, i) => {
-            let newCards = this._deck.dealCard();
-            let discardedCard = user.hand.discardAndReceive(cardIndex, newCards[0]);
+            let newCard = this._deck.dealCard();
+            let discardedCard = player.hand.discardAndReceive(cardIndex, newCard[0]);
             this._deck.returnCard(discardedCard);
         });
+
+        return new Discard(name, cardIndexes.length);
     }
 
-    public raise(player: IPlayer) {
-        let playerGame = this._findUserPlaying(player);
-        let raiseAmount = this._currentBet.add(new PokerChip(RAISE_AMOUNT));
-        playerGame.wallet = playerGame.wallet.subtract(raiseAmount);
-        this._pool = this._pool.add(raiseAmount);
-    }
+    public raise(name: string) {
+        let player = this._players[name];
+        this._currentBet = this._currentBet.add(new PokerChip(RAISE_AMOUNT));
 
-    public see(player: IPlayer) {
-        let playerGame = this._findUserPlaying(player);
         let amount = this._currentBet;
-        playerGame.wallet = playerGame.wallet.subtract(amount);
+        player.wallet = player.wallet.subtract(this._currentBet);
         this._pool = this._pool.add(amount);
+
+        return new Raise(name, amount.getValue());
     }
 
-    public fold(player: IPlayer): void {
-        let playerGame = this._findUserPlaying(player);
-        playerGame.status = PlayerState.Fold;
+    public see(name: string) {
+        let player = this._players[name];
+        let amount = this._currentBet;
+        player.wallet = player.wallet.subtract(this._currentBet);
+        this._pool = this._pool.add(amount);
+
+        return new See(name, amount.getValue());
     }
 
-    public showCards(player: IPlayer): ICard[] {
-        let playerGame = this._findUserPlaying(player);
-        return playerGame.hand.cards();
+    public fold(name: string) {
+        let player = this._players[name];
+        player.status = PlayerState.Fold;
+
+        return new Fold(name);
     }
 
-    public won(player: IPlayer) {
-        let playerGame = this._findUserPlaying(player);
-        playerGame.wallet = playerGame.wallet.add(this._pool);
-        this._pool = new PokerChip();
-    }
-    public playerPushCardsToCheckWon(player: IPlayer) {
-        let playerGame = this._findUserPlaying(player);
-        if (!this.tempWinningHand) {
-            this.tempWinningHand = playerGame;
-        } else {
-            let handWinner = new HandWinner(this.tempWinningHand.hand, playerGame.hand);
-            if (!handWinner.getWinner()) {
-                this.tempWinningHand.status = PlayerState.Fold;
-                this.tempWinningHand = playerGame;
-            }
-        }
+    public show(name: string) {
+        let player = this._players[name];
+        return new Show(name, player.hand);
     }
 
-    public getWon() {
-        let playersPlaying = _.filter(this._players, (player) => {
+    public end() {
+        let endList: End[] = [];
+        let winner: IPlayerGame;
+
+        let names = _.keysIn(this._players);
+        let players = _.map(names, (name) => {
+            let player = this._players[name];
+            return player;
+        })
+
+        let playersPlaying = _.filter(players, (player) => {
             return player.status == PlayerState.Playing;
-        });
-        if (!(playersPlaying.length == 1)) {
-            throw new Error('Error game didnot finish!');
+        })
+
+        if (playersPlaying.length == 1) {
+            winner = playersPlaying[0];
+        } else {
+            let playerOrder = _.sortBy(playersPlaying, (player) => {
+                return this.handTool.getGameValue(player.hand);
+            });
+
+            endList = _.times(playerOrder.length - 1, (i) => {
+                let player = playerOrder[i];
+                return new End(player.name, GameEndState.Lost, player.wallet.getValue());
+            })
+            winner = playerOrder[playerOrder.length - 1];
         }
-        return playersPlaying[0].player;
+
+        winner.wallet = winner.wallet.add(this._pool);
+        this._pool = new PokerChip();
+        endList.push(new End(winner.name, GameEndState.Won, winner.wallet.getValue()));
+        return endList;
     }
 
-    public getPlayers(): IPlayer[] {
-        let players = _.map(this._players, (playerGame) => {
-            return playerGame.player;
-        });
-        return _.slice(players);
+    public getPlayers(): string[] {
+        return _.keysIn(this._players);
     }
 
     public getCurrentBet(): IPokerChip {
         return this._currentBet;
     }
 
-    public checkAndSetBust(player: IPlayer): boolean {
-        let playerGame = this._findUserPlaying(player);
-        let playerMoney = playerGame.wallet.getValue();
+    public checkAndSetBust(name: string) {
+        let player = this._players[name];
+        let playerMoney = player.wallet.getValue();
         let currentBet = this._currentBet.getValue();
 
         if (playerMoney < currentBet) {
-            playerGame.status = PlayerState.Bust;
-            return true;
+            player.status = PlayerState.Bust;
+            return new Bust(name);
         }
 
-        return false;
+        return undefined;
+    }
+
+    public getPlayerGame(name: string) {
+        return this._players[name];
     }
 
     private index: number = 0;
-    public getNextPlayer(): IPlayer {
-        if (this.index >= this._players.length) {
+    public getNextPlayer(): string {
+        if (this.index >= this._playerNames.length) {
             return undefined;
         }
 
-        let playerGame = this._players[this.index];
-        while (playerGame.status != PlayerState.Playing && this.index < this._players.length - 1) {
+        let name = this._playerNames[this.index];
+        let playerGame = this._players[name];
+        while (playerGame.status != PlayerState.Playing
+            && this.index < this._playerNames.length - 1) {
             this.index++;
-            playerGame = this._players[this.index];
+            name = this._playerNames[this.index];
+            playerGame = this._players[name];
         }
         this.index++;
-        return playerGame.player;
+        return name;
     }
 
     public resetTurn(): void {
@@ -164,20 +198,20 @@ export class GameState {
     }
 
     public isGameOver(): boolean {
-        let playersPlaying = _.filter(this._players, (player) => {
+        let playersPlaying = _.filter(this._playerNames, (name) => {
+            let player = this._players[name];
             return player.status == PlayerState.Playing;
         });
         return playersPlaying.length == 1;
     }
 
-    public removePlayer(player: IPlayer): void {
-        let playerGame = this._findUserPlaying(player);
-        _.pull(this._players, playerGame);
+    public removePlayer(name: string): void {
+        _.pull(this._playerNames, name);
+        _.unset(this._players, name);
     }
 
-    private _findUserPlaying(player: IPlayer): IPlayerGame {
-        return _.find(this._players, (user) => {
-            return _.isEqual(player.getName(), user.player.getName());
-        });
+    public isInTheGame(name: string) {
+        let player = this._players[name];
+        return player ? true : false;
     }
 }

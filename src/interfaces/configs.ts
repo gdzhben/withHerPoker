@@ -10,6 +10,7 @@ export const twitterConfig: twit.ConfigKeys = {
 export const mongoDbConnectionString = 'mongodb://withHer:1234@localhost/test';
 
 export const NO_OF_CARDS = 52;
+export const NO_CARD_TYPES = 13;
 export const SIZE_OF_HANDS = 5;
 export const START_MONEY = 100;
 export const RAISE_AMOUNT = 5;

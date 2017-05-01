@@ -33,7 +33,7 @@ export class StupidPlayer implements IPlayer {
         return Promise.resolve(EndGameType.Show);
     }
 
-    public endTurn(gameInfo: IGameInfo, endGameState: EndGameType): Promise<boolean> {
+    public endTurn(gameInfo: IGameInfo): Promise<boolean> {
         return Promise.resolve(true);
     }
 }

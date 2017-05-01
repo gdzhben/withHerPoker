@@ -6,19 +6,19 @@ export interface ICard {
     getFaceValue(): number;
     toString(): string;
     toShortString(): string;
-    equals(card: string | ICard): boolean;
+    equals(card: ICard): boolean;
 }
 
 export interface IDeck {
     shuffle(): void;
     returnCard(Card: ICard): void;
-    drawCard(): ICard;
-    sizeOfDeck(): number;
-    containCard(card: ICard): boolean;
+    dealCard(noOfCards: number): ICard[];
+    cardsLeft(): number;
+    hasCard(card: ICard): boolean;
 }
 
 export interface IHand {
-    discardAndReceive(discardCard: number | string | ICard, newCard: ICard): ICard;
+    discardAndReceive(discardCard: number | ICard, newCard: ICard): ICard;
     sort(): void;
     getCard(index: number): ICard;
     cards(): ICard[];

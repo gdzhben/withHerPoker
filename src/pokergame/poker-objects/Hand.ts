@@ -1,12 +1,13 @@
 import * as _ from 'lodash';
 
 import { IHand, ICard, SIZE_OF_HANDS } from '../../interfaces';
+import { HandTool } from './HandTool';
 
 export class Hand implements IHand {
     private _cards: ICard[];
     private _discardedCount: number;
 
-    constructor(cards: ICard[]) {
+    constructor(cards: ICard[], private handTool: HandTool) {
         if (_.size(cards) != SIZE_OF_HANDS)
             throw new Error("Expected array of size " + SIZE_OF_HANDS);
 
@@ -20,7 +21,7 @@ export class Hand implements IHand {
         this.sort();
     }
 
-    public discardAndReceive(discardCard: number | string | ICard, newCard: ICard): ICard {
+    public discardAndReceive(discardCard: number | ICard, newCard: ICard): ICard {
         let index = -1;
         if (_.isNumber(discardCard)) {
             if (discardCard < 0 || discardCard >= _.size(this._cards)) {
@@ -80,5 +81,13 @@ export class Hand implements IHand {
             return elem.toString();
         });
         return _.join(mapped, ', ');
+    }
+
+    public getHandType() {
+        return this.handTool.getHandType(this);
+    }
+
+    public getGameValue() {
+        return this.handTool.getGameValue(this);
     }
 }
