@@ -7,6 +7,7 @@ import {
 import { PokerChip } from '../poker-objects/PokerChip'
 import { GameState } from './GameState'
 import { GameLog } from './GameLog'
+import { HumanPlayer } from '../player/HumanPlayer'
 
 export class Dealer {
 
@@ -55,7 +56,7 @@ export class Dealer {
             this.secondRound();
             return;
         }
-        
+
         let playerGame = this._gameState.getPlayerGame(playerName);
         player.dealCards(playerGame.hand);
 
@@ -96,6 +97,10 @@ export class Dealer {
             let result: Info;
             result = this._gameState.discard(playerName, command);
             this.log.log(result);
+
+            let playerGame = this._gameState.getPlayerGame(playerName);
+            player.dealCards(playerGame.hand);
+
             this.secondRound();
         }).catch((error) => {
             console.log(error);
@@ -163,15 +168,51 @@ export class Dealer {
         });
     }
 
+    private endTurnArray: string[] = [];
     private endRound() {
         let result = this._gameState.end();
         _.forEach(result, (elem) => {
             this.log.log(elem);
         });
+        this.endTurnArray = [];
         this.playAgain();
     }
 
     private playAgain() {
+        let playerName = this._gameState.getNextPlayer();
+        let player = this._players[playerName];
+        if (!player) {
+            this._gameState.resetTurn();
+            this.restart();
+            return;
+        }
+        player.endTurn(this.log.getLog()).then((command) => {
+            let result: Info;
+            if (command) {
+                this.endTurnArray.push(playerName);
+            }
+            this.playAgain();
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
 
+    private restart() {
+        if (this.endTurnArray.length >= 1) {
+            if (this._isThereHumanPlayer()) {
+            }
+        }
+        this._hasGameEnded = true;
+    }
+
+    private _isThereHumanPlayer(): boolean {
+        let yes = false;
+        _.forEach(this.endTurnArray, (name) => {
+            let player = this._players[name];
+            if (player instanceof HumanPlayer) {
+                yes = true;
+            }
+        })
+        return yes;
     }
 }

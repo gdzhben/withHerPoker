@@ -150,6 +150,13 @@ export class GameState {
         return endList;
     }
 
+    public getBustedPlayer(): string[] {
+        return _.filter(this._playerNames, (name) => {
+            let player = this._players[name];
+            return player.status == PlayerState.Bust;
+        });
+    }
+
     public getPlayers(): string[] {
         return _.keysIn(this._players);
     }

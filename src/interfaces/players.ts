@@ -91,7 +91,7 @@ export class Show {
 
     }
     toString(): string {
-        return `${this.name} shows his hand!`
+        return `${this.name} shows his hand! (${this.hand.toString()})`
     }
 }
 

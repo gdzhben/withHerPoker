@@ -62,6 +62,7 @@ export class HumanPlayer implements IPlayer {
 
     public endTurn(gameInfo: IGameInfo): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
+            this.display(gameInfo);
             this.tools.reply(Message.QUESTION.PLAY_AGAIN_COMMAND_QUESTION);
             this.resolveEnd = resolve;
         });
@@ -70,9 +71,9 @@ export class HumanPlayer implements IPlayer {
     private display(gameInfo: IGameInfo) {
         let count = 0;
         let str = '';
-        _.forEach(gameInfo, (info) => {
+        _.forEachRight(gameInfo, (info) => {
             info.toString();
-            str = str.concat(info.toString() + '\n');
+            str = info.toString().concat(str + '\n');
             count++;
             return count < 5;
         })
