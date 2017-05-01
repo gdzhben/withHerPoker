@@ -1,3 +1,4 @@
+export * from './interfaces/common';
 export * from './interfaces/configs';
 export * from './interfaces/message';
 

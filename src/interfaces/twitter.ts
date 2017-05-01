@@ -1,3 +1,5 @@
+import * as rx from 'rxjs/Rx';
+
 export interface IUser {
     id: string
     screenName: string
@@ -14,8 +16,9 @@ export interface ITwitterBot {
     getUsername(): Promise<string>;
     sendDirectMessage(screenName: string, text: string): Promise<void>;
     createFriendship(screenName: string): Promise<void>;
-    directMessagesStream(): Promise<IUserMessage>;
-    followStream(): Promise<IUser>;
-    start(): void;
-    stop(): void;
+}
+
+export interface ITwitterStream {
+    directMessagesObservable(): rx.Observable<IUserMessage>;
+    followObservable(): rx.Observable<IUser>;
 }

@@ -4,7 +4,7 @@ import {
     SuitType, CommandType, ICard, IDeck, IPlayer, ICommand,
     IPokerChip, IHand, SIZE_OF_HANDS, GameEndState, START_MONEY,
     IPlayerGame, RAISE_AMOUNT, IBettingRound, IDiscardingRound, IShowdownRound,
-    PlayerState
+    PlayerState, START_BET
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip';
 import { DeckFactory } from '../poker-objects/DeckFactory';
@@ -28,7 +28,7 @@ export class GameState {
         this._deck = new Decks(DeckFactory.createStandardCards());
 
         this._pool = new PokerChip();
-        this._currentBet = new PokerChip();
+        this._currentBet = new PokerChip(START_BET);
         this._startDate = new Date();
 
         _.forEach(players, (player) => {
@@ -47,6 +47,8 @@ export class GameState {
         this._deck.reset();
         this._deck.shuffle();
         this.tempWinningHand = undefined;
+        this._currentBet = new PokerChip(START_BET);
+        
         _.forEach(this._players, (user) => {
             let dealtCards = this._deck.dealCard(SIZE_OF_HANDS);
             user.hand = new Hand(dealtCards);
@@ -59,9 +61,9 @@ export class GameState {
 
     public discard(player: IPlayer, cardIndexes: number[]) {
         let user = this._findUserPlaying(player);
-        let newCards = this._deck.dealCard();
         _.forEach(cardIndexes, (cardIndex, i) => {
-            let discardedCard = user.hand.discardAndReceive(cardIndex, newCards[i]);
+            let newCards = this._deck.dealCard();
+            let discardedCard = user.hand.discardAndReceive(cardIndex, newCards[0]);
             this._deck.returnCard(discardedCard);
         });
     }

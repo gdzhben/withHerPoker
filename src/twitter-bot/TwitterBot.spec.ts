@@ -1,5 +1,5 @@
+import { twitterConfig } from '../interfaces'
 import { TwitterBot } from "./TwitterBot";
-import { twitterConfig } from './twitter-config'
 
 describe('TwitterBot', () => {
 
@@ -53,7 +53,7 @@ describe('TwitterBot', () => {
 
     describe('sendDirectMessage', () => {
 
-        it('should send message successfully', (done) => {
+        xit('should send message successfully', (done) => {
             let text = 'Test direct message!';
             twitterBot.sendDirectMessage(otherUserId, text)
                 .then(() => {

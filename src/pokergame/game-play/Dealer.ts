@@ -18,7 +18,6 @@ export class Dealer {
         if (players && players.length !== 5) {
             throw new Error("must have 5 players in order to play.");
         }
-        this._players = _.shuffle(this._players);
         this._gameState = new GameState(players);
     }
 
@@ -46,6 +45,8 @@ export class Dealer {
             this.secondRound();
             return;
         }
+
+        this._gameLogger.setCurrentBet(this._gameState.getCurrentBet().getValue());
         player.betting(this._gameLogger.getLog()).then((command) => {
             if (command == CommandType.Fold) {
                 this._gameState.fold(player);
@@ -139,7 +140,7 @@ export class Dealer {
                 this._gameState.playerPushCardsToCheckWon(player);
             }
             this._gameLogger.addFourthRound(player.getName(), command, cards);
-            this.firstRound();
+            this.showdownRound();
         }).catch((error) => {
             console.log(error);
         });

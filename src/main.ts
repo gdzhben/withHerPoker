@@ -1,37 +1,29 @@
-import { App } from './App';
 import * as ex from 'express';
-import { MongoDb } from './mongodb/MongoDb';
 
-var app = new App();
+import {
+    twitterConfig, mongoDbConnectionString
+} from './interfaces';
+import { App } from './App';
+import { MongoDb } from './mongodb/MongoDb';
+import { TwitterBot } from './twitter-bot/TwitterBot';
+
+const twitterBot = new TwitterBot(twitterConfig);
+const app = new App(twitterBot);
 app.start().then(() => {
     console.log('Twitter stream started!');
-
-    app.subscribe();
-    // .then(() => {
-    //     console.log('Message being recieved!');
-    // }).catch((error: Error) => {
-    //     console.log(error);
-    // });
-
+    app.subscribeDirectMessage();
     app.subscribeFollow();
-    // .then(() => {
-    //     console.log('Follow being recieved!');
-    // }).catch((error: Error) => {
-    //     console.log(error);
-    // });
 }).catch((error: Error) => {
     console.log(error);
 });
 
-var express: ex.Application = ex();
+const express: ex.Application = ex();
+const mongo = new MongoDb(mongoDbConnectionString);
 
 express.listen(3000, () => {
     console.log('withHer Poker app listening on port 3000!');
 });
 
-
-let testConnectionString = 'mongodb://withHer:1234@localhost/test';
-var mongo = new MongoDb(testConnectionString);
 express.get('/leaderboard', (req, res) => {
     mongo.getLeaderboard(10).then((data) => {
         res.send(data);

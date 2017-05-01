@@ -21,7 +21,8 @@ export class Message {
         BETTING_COMMAND_ERROR: "Your input to the game was invalid. Your input should be as following: see raise fold!",
         DISCARD_COMMAND_ERROR: "Valid commands are (3 nos. inclusive between 0 and 4 separated by comma or space) or 'no'",
         SHOWDOWN_COMMAND_ERROR: "Valid commands are show or fold!",
-        PLAY_AGAIN_COMMAND_ERROR: "Valid commands are yes/y or no/n!"
+        PLAY_AGAIN_COMMAND_ERROR: "Valid commands are yes/y or no/n!",
+        WAIT_FOR_SERVER_TO_PROCESS: "Wait for the server to respond!"
     }
 
     public static readonly QUESTION = {

@@ -7,8 +7,6 @@ import {
 import { Dealer } from './Dealer';
 import { HumanPlayer } from '../player/HumanPlayer';
 import { StupidPlayer } from '../player/StupidPlayer';
-import { TwitterBot } from '../../twitter-bot/TwitterBot';
-import { twitterConfig } from '../../twitter-bot/twitter-config';
 
 export class GamePlay {
 

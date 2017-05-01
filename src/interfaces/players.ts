@@ -7,10 +7,10 @@ import { IPokerChip, IHand, ICard } from './poker-objects';
 export interface IPlayer {
     getName(): string;
     dealCards(hand: IHand): void;
-    betting(gameInfo: any): Promise<CommandType>;
-    discard(gameInfo: any): Promise<number[]>;
-    showdown(gameInfo: any): Promise<EndGameType>;
-    endTurn(gameInfo: any, endGameState: EndGameType): Promise<boolean>;
+    betting(gameInfo: IGameInfo): Promise<CommandType>;
+    discard(gameInfo: IGameInfo): Promise<number[]>;
+    showdown(gameInfo: IGameInfo): Promise<EndGameType>;
+    endTurn(gameInfo: IGameInfo, endGameState: EndGameType): Promise<boolean>;
 }
 
 export interface IPlayerGame {
@@ -32,6 +32,7 @@ export interface IGameInfo {
     secondRound: IDiscardingRound[],
     thirdRound: IBettingRound[],
     fourthRound: IShowdownRound[],
+    toString: (roundNo: number) => string;
 }
 
 export interface IBettingRound {
