@@ -5,7 +5,7 @@ export class PokerChip implements IPokerChip {
     private _value: number
 
 
-    constructor(value: number) {
+    constructor(value: number = 0) {
         this._value = value;
     }
 

@@ -3,8 +3,7 @@ import { Command } from './Command';
 
 export class CommandParser implements ICommandParser {
     private readonly commands = {
-        'See': CommandType.See, 'Fold': CommandType.Fold, 'Raise': CommandType.Raise,
-        'Show': CommandType.Show, 'Discard': CommandType.Discard
+        'See': CommandType.See, 'Fold': CommandType.Fold, 'Raise': CommandType.Raise
     };
 
     public parseToObject(commandString: string) {

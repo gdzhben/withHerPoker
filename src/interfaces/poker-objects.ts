@@ -21,6 +21,7 @@ export interface IHand {
     discardAndReceive(discardCard: number | string | ICard, newCard: ICard): ICard;
     sort(): void;
     getCard(index: number): ICard;
+    cards(): ICard[];
     size(): number;
     getDiscardedCount(): number;
     toString(): string;

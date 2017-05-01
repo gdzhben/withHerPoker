@@ -3,7 +3,25 @@ import * as ex from 'express';
 import { MongoDb } from './mongodb/MongoDb';
 
 var app = new App();
-app.start();
+app.start().then(() => {
+    console.log('Twitter stream started!');
+
+    app.subscribe();
+    // .then(() => {
+    //     console.log('Message being recieved!');
+    // }).catch((error: Error) => {
+    //     console.log(error);
+    // });
+
+    app.subscribeFollow();
+    // .then(() => {
+    //     console.log('Follow being recieved!');
+    // }).catch((error: Error) => {
+    //     console.log(error);
+    // });
+}).catch((error: Error) => {
+    console.log(error);
+});
 
 var express: ex.Application = ex();
 

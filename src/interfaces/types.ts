@@ -1,9 +1,12 @@
 export enum CommandType {
     See,
     Raise,
-    Fold,
+    Fold
+}
+
+export enum EndGameType {
     Show,
-    Discard
+    Lose
 }
 
 export enum HandType {
@@ -20,8 +23,20 @@ export enum HandType {
 }
 
 export enum SuitType {
-    Hearts = 2,
-    Clubs = 1,
-    Spades = 3,
-    Diamonds = 0
+    Hearts,
+    Clubs,
+    Spades,
+    Diamonds
+}
+
+export enum PlayerState {
+    Playing,
+    Fold,
+    Bust
+}
+
+export enum GameEndState {
+    Lost = 0,
+    Won = 1,
+    Fold = 2
 }

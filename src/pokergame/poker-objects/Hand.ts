@@ -59,6 +59,14 @@ export class Hand implements IHand {
         return this._cards[index];
     }
 
+    public cards(): ICard[] {
+        let cards: ICard[] = [];
+        _.forEach(this._cards, (card) => {
+            cards.push(card);
+        });
+        return cards;
+    }
+
     public size(): number {
         return _.size(this._cards);
     }

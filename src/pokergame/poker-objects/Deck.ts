@@ -9,12 +9,12 @@ export class Deck implements IDeck {
 
     constructor(cards: ICard[]) {
         if (cards) {
-            this._deckOfCards = cards;
+            this._deckOfCards = _.slice(cards);
         }
     }
 
     public shuffle(): void {
-        _.shuffle(this._deckOfCards);
+        this._deckOfCards = _.shuffle(this._deckOfCards);
     }
 
     public drawCard(): ICard {

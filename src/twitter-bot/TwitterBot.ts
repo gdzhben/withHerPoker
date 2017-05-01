@@ -1,15 +1,20 @@
 import * as _ from 'lodash';
 import * as Twit from 'twit';
+import * as rx from 'rxjs/Rx';
 
-import { ITwitterBot, IUser } from '../interfaces';
+import { ITwitterBot, IUser, IUserMessage, BOT_SCREEN_NAME } from '../interfaces';
 
-export class TwitterBot implements ITwitterBot {
+export class TwitterBot //implements ITwitterBot 
+{
 
     private _bot: Twit;
     private readonly _userStreamName: Twit.StreamEndpoint = 'user';
     private _userStream: NodeJS.ReadableStream;
-    private _getDirectMessagePromise: Promise<IUser>;
+    private _getDirectMessagePromise: Promise<IUserMessage>;
     private _followPromise: Promise<IUser>;
+
+    private _obsMessage: rx.Subject<IUserMessage> = new rx.Subject<IUserMessage>();
+    private _obsFollow: rx.Subject<IUser> = new rx.Subject<IUser>();
 
     constructor(twitterConfig: Twit.ConfigKeys) {
         this._bot = new Twit(twitterConfig);
@@ -82,7 +87,7 @@ export class TwitterBot implements ITwitterBot {
             }).catch(this._handleError);
     }
 
-    public directMessagesStream(): Promise<IUser> {
+    public directMessagesStream(): Promise<IUserMessage> {
         return this._getDirectMessagePromise;
     }
 
@@ -98,25 +103,38 @@ export class TwitterBot implements ITwitterBot {
         }
     }
 
+    public directMessagesObservable() {
+        return this._obsMessage.asObservable();
+    }
+
+    public followObservable() {
+        return this._obsFollow.asObservable();
+    }
+
+
     private _createStreams() {
         this._userStream = this._bot.stream(this._userStreamName);
-        this._getDirectMessagePromise = new Promise<IUser>((resolve, reject) => {
+        this._getDirectMessagePromise = new Promise<IUserMessage>((resolve, reject) => {
             this._userStream.on('direct_message', (msg: TwitterMessage) => {
-                if (_.hasIn(msg, 'direct_message.sender_id_str') && _.hasIn(msg, 'direct_message.sender_screen_name')) {
+                if (!(_.hasIn(msg, 'direct_message.sender_id_str') && _.hasIn(msg, 'direct_message.sender_screen_name'))) {
                     reject(new Error('Error in receiving message'));
                 }
 
-                let user: IUser = {
+                let user: IUserMessage = {
                     id: msg.direct_message.sender_id_str,
-                    screenName: msg.direct_message.sender_screen_name
+                    screenName: msg.direct_message.sender_screen_name,
+                    text: msg.direct_message.text
                 }
-                resolve(user);
+                if (!_.isEqual(msg.direct_message.sender_screen_name, BOT_SCREEN_NAME)) {
+                    this._obsMessage.next(user);
+                    resolve(user);
+                }
             });
         });
 
         this._followPromise = new Promise<IUser>((resolve, reject) => {
             this._userStream.on('follow', (msg: TwitterFollower) => {
-                if (_.hasIn(msg, 'source.id_str') && _.hasIn(msg, 'source.screen_name')) {
+                if (!(_.hasIn(msg, 'source.id_str') && _.hasIn(msg, 'source.screen_name'))) {
                     reject(new Error('Error in receiving followers'));
                 }
 
@@ -124,6 +142,7 @@ export class TwitterBot implements ITwitterBot {
                     id: msg.source.id_str,
                     screenName: msg.source.screen_name
                 }
+                this._obsFollow.next(user);
                 resolve(user);
             });
         });

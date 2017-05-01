@@ -1,35 +1,42 @@
-import { ITwitterBot } from './interfaces';
+import * as _ from 'lodash';
+
+import { GamePlay } from './pokergame/game-play/GamePlay'
 import { TwitterBot } from './twitter-bot/TwitterBot';
 import { twitterConfig } from './twitter-bot/twitter-config';
 
-
 export class App {
 
-    private _twitterBot: ITwitterBot;
+    public gamePlay: GamePlay;
+    private bot: TwitterBot;
 
     constructor() {
-        this._twitterBot = new TwitterBot(twitterConfig);
+        this.bot = new TwitterBot(twitterConfig);
+        this.gamePlay = new GamePlay(this.bot);
     }
 
-    public start(): void {
-        this._twitterBot.start();
-
-        this._twitterBot.directMessagesStream()
-            .then((user) => {
-
-            }).catch((err: Error) => {
-                console.log(err);
-            });
-
-        this._twitterBot.followStream()
-            .then((user) => {
-
-            }).catch((err) => {
-                console.log(err);
-            })
+    public start() {
+        return this.bot.start();
     }
 
     public stop(): void {
-        this._twitterBot.stop();
+        this.bot.stop();
+    }
+
+    public subscribe() {
+        this.bot.directMessagesObservable().subscribe((user) => {
+            this.gamePlay.recievedMessage(user);
+        });
+        // return this.bot.directMessagesStream().then((user) => {
+        //     this.gamePlay.recievedMessage(user);
+        // });
+    }
+
+    public subscribeFollow() {
+        this.bot.followObservable().subscribe((user) => {
+            this.bot.sendDirectMessage(user.id, "Welcome to poker game!");
+        });
+        // return this.bot.followStream().then((user) => {
+        //     this.bot.sendDirectMessage(user.id, "Welcome to poker game!");
+        // });
     }
 }
