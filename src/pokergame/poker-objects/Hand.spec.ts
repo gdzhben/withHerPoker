@@ -32,7 +32,7 @@ describe('Hand', function () {
             testHand.sort();
 
             let result = testHand.toString();
-            expect(result).toBe("3 of Hearts, 5 of Diamonds, 6 of Diamonds, 10 of Diamonds, K of Clubs");
+            expect(result).toBe("HighHand:\n3 of Hearts, 5 of Diamonds, 6 of Diamonds, 10 of Diamonds, K of Clubs");
         });
     });
 
@@ -69,7 +69,7 @@ describe('Hand', function () {
     describe('toString', () => {
         it('it must return the list of cards in hand', () => {
             let result = testHand.toString();
-            expect(result).toBe("3 of Hearts, 5 of Diamonds, 6 of Diamonds, 10 of Diamonds, K of Clubs");
+            expect(result).toBe("HighHand:\n3 of Hearts, 5 of Diamonds, 6 of Diamonds, 10 of Diamonds, K of Clubs");
         });
     });
 });
