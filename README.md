@@ -1,5 +1,6 @@
 # withHerPoker
 Twitter-based implementation of five card draw Poker.
+[http://138.68.182.187:3000/](http://138.68.182.187:3000/) <- leaderboard
 
 ## Installing Prerequisites
 1. [NodeJs v7.8.0](https://nodejs.org/en/) 
@@ -36,8 +37,29 @@ Compiling the code from TS to JS
 ```
 npm run build
 ```
+After installing mongodb
 
-Running the code
+```
+db.createUser(
+   {
+     user: "withHer",
+     pwd: "1234",
+     roles: [ "readWrite", "dbAdmin" ]
+   }
+)
+```
+Make sure to create the above user
+Run mongo server in the background
+```
+mongod
+```
+Then in new shell
+Running the test
 ```
 npm test
+```
+Running the code, starts a server
+```
+npm run build
+node ./build/main.js
 ```
