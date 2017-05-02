@@ -86,7 +86,7 @@ describe('HandTool', () => {
 
         it('Should return royal flush.', () => {
             cards = [
-                new Card(SuitType.Diamonds, 1),
+                new Card(SuitType.Diamonds, 14),
                 new Card(SuitType.Diamonds, 10),
                 new Card(SuitType.Diamonds, 11),
                 new Card(SuitType.Diamonds, 12),

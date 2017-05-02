@@ -50,9 +50,7 @@ export class Hand implements IHand {
     }
 
     public sort(): void {
-        this._cards = _.sortBy(this._cards, (elem) => {
-            return elem.getFaceValue();
-        });
+        this._cards = this.handTool.sort(this._cards);
     }
 
     public getCard(index: number): ICard {

@@ -74,13 +74,15 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
-
     public gameOver(game: GameOverState, money?: number): void {
         if (game == GameOverState.Bust) {
             this.tools.reply(Message.OTHER.BUST_MESSAGE);
-        } else {
+        } else if(game == GameOverState.Won) {
             this.tools.reply(`You won ${money} chips!`
                 + "\n" + Message.OTHER.WON_MESSAGE);
+        }else {
+            this.tools.reply(`You had ${money} chips left!`
+                + "\n" + Message.OTHER.QUIT_MESSAGE);
         }
     }
 
@@ -121,7 +123,7 @@ export class HumanPlayer implements IPlayer {
                 }
             } else if (this.resolveEnd) {
                 let type = this.validateEnd(msg);
-                if (type) {
+                if (!_.isUndefined(type)) {
                     this.resolveEnd(type);
                     this.resolveEnd = undefined;
                 }
