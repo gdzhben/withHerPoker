@@ -25,6 +25,8 @@ export interface IHand {
     size(): number;
     getDiscardedCount(): number;
     toString(): string;
+    getHandType(): HandType;
+    getGameValue(): number;
 }
 
 export interface IHandClassifier {

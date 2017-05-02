@@ -3,82 +3,86 @@ import * as rx from 'rxjs/Rx';
 
 
 import {
-    HandType, CommandType, EndGameType, SuitType
-} from '../../../interfaces';
-import { IAI } from './IAI';
+    HandType, BettingType, ShowDownType, SuitType, IPlayer, IGameInfo, PlayerInfo, GameOverState, IHand
+    , RAISE_AMOUNT
+} from '../../interfaces';
 
-export class AI implements IAI {
+export class AI implements IPlayer {
     private bluffAbility: number;
     private riskAversion: number;
-    private gameInfo: any;
-    private myInfo: any;
+    private name: string;
 
-    // TO-DO add values for field to constructor.
-    constructor(gameInfo: any, myInfo: any, bluffAbility: number, riskAversion: number) {
+    private gameInfo: any;
+    private myInfo: PlayerInfo;
+    private hand: IHand;
+
+    constructor(name: string, bluffAbility: number, riskAversion: number) {
+        this.name = name;
         this.bluffAbility = bluffAbility;
         this.riskAversion = riskAversion;
-
-        this.gameInfo = gameInfo;
-        this.myInfo = myInfo;
     }
 
-    public yourTurn(dealer: any) {
-        let command = this.getTurnCommand();
-
-        if (command == HandType[this.gameInfo.getHandType()]) {
-            command += " " + this.betAmount();
-        }
-
-        // Check if command is valid.
-        if (dealer.giveCommand(command)) {
-
-        } else {
-
-        }
+    public getName(): string {
+        return this.name;
     }
 
-    // Argument for raise command.
-    // Bet should be in proportion with hand rank.
-    // bet = ((10 - hand rank) / 10) * totalChips.
-    // e.g. HighHand: (10 - 10 / 10) * totalChips = 0.
-    private betAmount(): number {
-        let numOfHandConfigs = Object.keys(HandType).length / 2;
-        let bet = ((numOfHandConfigs - this.myInfo.getHandType()) / numOfHandConfigs) * this.myInfo.totalChips();
-
-        return Math.floor(bet);
+    public dealCards(hand: IHand, info: PlayerInfo): void {
+        this.hand = hand;
+        this.myInfo = info;
     }
 
-    // Return string corresponding to command with highest rating.
-    public getTurnCommand(): string {
-        let ratings = [
-            { "see": this.getSeeRating() },
-            { "raise": this.getRaiseRating() },
-            { "fold": this.getFoldRating() }
-        ]
+    public betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType> {
+        let ratings: number[] = [
+            this.getSeeRating(),
+            this.getRaiseRating(),
+            this.getFoldRating()
+        ];
 
         let max = 0;
-        let outputCommand = "fold";
+        let outputCommand = BettingType.Fold;
 
-        for (let i = 0; i < ratings.length; i++) {
-            let obj = ratings[i];
-            for (let key in obj) {
-                let command = key;
-                let rating = obj[key];
-
-                if (rating > max) {
-                    max = rating;
-                    outputCommand = key;
-                }
+        if (this.myInfo.wallet.getValue() > this.myInfo.currentBet.getValue() + RAISE_AMOUNT) {
+            let max = _.max(ratings);
+            let index = _.indexOf(ratings, max);
+            if (index == 0) {
+                outputCommand = BettingType.See;
+            } else if (index == 1) {
+                outputCommand = BettingType.Raise;
             }
         }
+        return Promise.resolve(outputCommand);
+    }
 
-        return outputCommand;
+    public discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]> {
+        this.myInfo = info;
+        return Promise.resolve([0, 1, 2]);
+    }
+
+    public showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType> {
+        this.myInfo = info;
+        let command: ShowDownType;
+        if (this.hand.getHandType() > 7) {
+            command = ShowDownType.Fold;
+        } else {
+            command = ShowDownType.Show;
+        }
+
+        return Promise.resolve(command);
+    }
+
+    public endTurn(gameInfo: IGameInfo, info: PlayerInfo): Promise<boolean> {
+        this.myInfo = info;
+        return Promise.resolve(true);
+    }
+
+    public gameOver(game: GameOverState, money?: number): void {
+
     }
 
     private getSeeRating(): number {
         let rating = 0;
 
-        switch (this.myInfo.getHandType()) {
+        switch (this.hand.getHandType()) {
             case 0:
             case 1:
             case 2:
@@ -117,7 +121,7 @@ export class AI implements IAI {
     private getRaiseRating(): number {
         let rating = 0;
 
-        switch (this.myInfo.getHandType()) {
+        switch (this.hand.getHandType()) {
             case 0:
             case 1:
             case 2:
@@ -162,7 +166,7 @@ export class AI implements IAI {
     private getFoldRating(): number {
         let rating = 0;
 
-        switch (this.myInfo.getHandType()) {
+        switch (this.hand.getHandType()) {
             case 0:
             case 1:
             case 2:
@@ -198,17 +202,5 @@ export class AI implements IAI {
         }
 
         return rating;
-    }
-
-    public discard(dealer: any): void {
-
-    }
-
-    public end(dealer: any): void {
-        if (this.myInfo.getHandType() > 7) {
-            dealer.giveCommand(EndGameType[EndGameType.Fold]);
-        } else {
-            dealer.giveCommand(EndGameType[EndGameType.Show]);
-        }
     }
 }

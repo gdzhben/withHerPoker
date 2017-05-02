@@ -3,8 +3,8 @@ import * as rx from 'rxjs/Rx';
 import 'rxjs/add/operator/toPromise';
 
 import {
-    IPlayer, IHand, CommandType, EndGameType, PlayerTools, MAX_CARDS_DISCARD,
-    SIZE_OF_HANDS, GameEndState, Message, IGameInfo, GameOverState
+    IPlayer, IHand, BettingType, ShowDownType, PlayerTools, MAX_CARDS_DISCARD,
+    SIZE_OF_HANDS, GameEndState, Message, IGameInfo, GameOverState, PlayerInfo, RAISE_AMOUNT
 } from '../../interfaces';
 import { GamePlay } from '../game-play/GamePlay';
 
@@ -14,10 +14,11 @@ export class HumanPlayer implements IPlayer {
     private _hand: IHand;
     private tools: PlayerTools
     private messages: string[];
+    private myInfo: PlayerInfo;
 
-    private resolveBetting: (value?: CommandType | PromiseLike<CommandType>) => void;
+    private resolveBetting: (value?: BettingType | PromiseLike<BettingType>) => void;
     private resolveDiscard: (value?: number[] | PromiseLike<number[]>) => void;
-    private resolveShowdown: (value?: EndGameType | PromiseLike<EndGameType>) => void;
+    private resolveShowdown: (value?: ShowDownType | PromiseLike<ShowDownType>) => void;
     private resolveEnd: (value?: boolean | PromiseLike<boolean>) => void;
 
     constructor(name: string, tools: PlayerTools) {
@@ -31,20 +32,23 @@ export class HumanPlayer implements IPlayer {
         return this._name;
     }
 
-    public dealCards(hand: IHand): void {
+    public dealCards(hand: IHand, info: PlayerInfo): void {
         this._hand = hand;
         this.tools.reply(hand.toString());
+        this.myInfo = info;
     }
 
-    public betting(gameInfo: IGameInfo): Promise<CommandType> {
-        return new Promise<CommandType>((resolve, reject) => {
+    public betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType> {
+        this.myInfo = info;
+        return new Promise<BettingType>((resolve, reject) => {
             this.display(gameInfo);
             this.tools.reply(Message.QUESTION.BETTING_COMMAND_QUESTION);
             this.resolveBetting = resolve;
         });
     }
 
-    public discard(gameInfo: IGameInfo): Promise<number[]> {
+    public discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]> {
+        this.myInfo = info;
         return new Promise<number[]>((resolve, reject) => {
             this.display(gameInfo);
             this.tools.reply(Message.QUESTION.DISCARD_COMMAND_QUESTION);
@@ -52,15 +56,17 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
-    public showdown(gameInfo: IGameInfo): Promise<EndGameType> {
-        return new Promise<EndGameType>((resolve, reject) => {
+    public showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType> {
+        this.myInfo = info;
+        return new Promise<ShowDownType>((resolve, reject) => {
             this.display(gameInfo);
             this.tools.reply(Message.QUESTION.SHOWDOWN_COMMAND_QUESTION);
             this.resolveShowdown = resolve;
         });
     }
 
-    public endTurn(gameInfo: IGameInfo): Promise<boolean> {
+    public endTurn(gameInfo: IGameInfo, info: PlayerInfo): Promise<boolean> {
+        this.myInfo = info;
         return new Promise<boolean>((resolve, reject) => {
             this.display(gameInfo);
             this.tools.reply(Message.QUESTION.PLAY_AGAIN_COMMAND_QUESTION);
@@ -78,16 +84,18 @@ export class HumanPlayer implements IPlayer {
         }
     }
 
+    private lastIndex = 0;
     private display(gameInfo: IGameInfo) {
-        let count = 0;
         let str = '';
-        _.forEachRight(gameInfo, (info) => {
-            info.toString();
-            str = info.toString().concat('\n' + str);
-            count++;
-            return count < 5;
+        _.forEach(gameInfo, (info, index) => {
+            if (index >= this.lastIndex) {
+                str = str.concat(info.toString() + '\n');
+            }
         })
-        this.tools.reply(str);
+        this.lastIndex = gameInfo.length;
+        if (str) {
+            this.tools.reply(str);
+        }
     }
 
     private subscribe() {
@@ -123,15 +131,26 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
-    private validateBetting(msg: string): CommandType {
+    private validateBetting(msg: string): BettingType {
         if (msg === "see") {
-            return CommandType.See;
+            if (this.myInfo.wallet.getValue() >= this.myInfo.currentBet.getValue()) {
+                return BettingType.See;
+            } else {
+                this.tools.reply(Message.ERRORS.NOT_ENOUGH_CHIPS);
+                return undefined;
+            }
         } else if (msg === "raise") {
-            return CommandType.Raise;
+            if (this.myInfo.wallet.getValue() >= this.myInfo.currentBet.getValue() + RAISE_AMOUNT) {
+                return BettingType.Raise;
+            } else {
+                this.tools.reply(Message.ERRORS.NOT_ENOUGH_CHIPS);
+                return undefined;
+            }
         } else if (msg === "fold") {
-            return CommandType.Fold;
+            return BettingType.Fold;
         }
         this.tools.reply(Message.ERRORS.BETTING_COMMAND_ERROR);
+        this.tools.reply(`You have ${this.myInfo.wallet.getValue()} chip(s) left!`);
         return undefined;
     }
 
@@ -165,11 +184,11 @@ export class HumanPlayer implements IPlayer {
         return undefined;
     }
 
-    private validateShowdown(msg: string): EndGameType {
+    private validateShowdown(msg: string): ShowDownType {
         if (msg === "show") {
-            return EndGameType.Show;
+            return ShowDownType.Show;
         } else if (msg === "fold") {
-            return EndGameType.Fold;
+            return ShowDownType.Fold;
         }
 
         this.tools.reply(Message.ERRORS.SHOWDOWN_COMMAND_ERROR);

@@ -1,16 +1,16 @@
 import * as rx from 'rxjs/Rx';
 
 import { ICommand } from './commands';
-import { CommandType, GameEndState, EndGameType, PlayerState, GameOverState } from './types';
+import { BettingType, GameEndState, ShowDownType, PlayerState, GameOverState } from './types';
 import { IPokerChip, IHand, ICard } from './poker-objects';
 
 export interface IPlayer {
     getName(): string;
-    dealCards(hand: IHand): void;
-    betting(gameInfo: IGameInfo): Promise<CommandType>;
-    discard(gameInfo: IGameInfo): Promise<number[]>;
-    showdown(gameInfo: IGameInfo): Promise<EndGameType>;
-    endTurn(gameInfo: IGameInfo): Promise<boolean>;
+    dealCards(hand: IHand, info: PlayerInfo): void;
+    betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType>;
+    discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]>;
+    showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType>;
+    endTurn(gameInfo: IGameInfo, info: PlayerInfo): Promise<boolean>;
     gameOver(game: GameOverState, money?: number): void;
 }
 
@@ -30,7 +30,7 @@ export interface PlayerTools {
 
 
 export class Bet {
-    public readonly commandType: CommandType;
+    public readonly commandType: BettingType;
     constructor(
         public readonly name: string,
         public readonly amount?: number) {
@@ -43,21 +43,21 @@ export class Bet {
 }
 
 export class Raise extends Bet {
-    public readonly commandType = CommandType.Raise;
+    public readonly commandType = BettingType.Raise;
     toString(): string {
         return `${this.name} raised bet to ${this.amount} chip(s).`
     }
 }
 
 export class See extends Bet {
-    public readonly commandType = CommandType.See;
+    public readonly commandType = BettingType.See;
     toString(): string {
         return `${this.name} see that ${this.amount} chip(s).`
     }
 }
 
 export class Fold extends Bet {
-    public readonly commandType = CommandType.Fold;
+    public readonly commandType = BettingType.Fold;
     toString(): string {
         return `${this.name} folds.`
     }
@@ -109,4 +109,9 @@ export class End {
 }
 
 export type IGameInfo = Info[];
+export interface PlayerInfo {
+    name: string,
+    wallet: IPokerChip,
+    currentBet: IPokerChip
+}
 export type Info = (Bet | Discard | Bust | Show);

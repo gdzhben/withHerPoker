@@ -1,10 +1,10 @@
-export enum CommandType {
+export enum BettingType {
     See = 1,
     Raise,
     Fold
 }
 
-export enum EndGameType {
+export enum ShowDownType {
     Show = 1,
     Fold
 }
@@ -37,7 +37,8 @@ export enum PlayerState {
 
 export enum GameEndState {
     Lost = 1,
-    Won = 2
+    Won = 2,
+    Fold = 3
 }
 
 export enum GameOverState {

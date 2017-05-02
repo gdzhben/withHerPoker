@@ -1,32 +1,36 @@
 import * as _ from 'lodash';
 
 import {
-    IPlayer, IPlayerGame, START_MONEY, CommandType, RAISE_AMOUNT,
-    IPokerChip, EndGameType, ICard, Info, GameOverState
+    IPlayer, IPlayerGame, START_MONEY, BettingType, RAISE_AMOUNT,
+    IPokerChip, ShowDownType, ICard, Info, GameOverState, GameEndState, START_BET, End, IMongoDb, IGameData
 } from '../../interfaces';
 import { PokerChip } from '../poker-objects/PokerChip'
-import { GameState } from './GameState'
+import { PokerGame } from './PokerGame'
 import { GameLog } from './GameLog'
 import { HumanPlayer } from '../player/HumanPlayer'
 
 export class Dealer {
 
-    private _gameState: GameState;
+    private _pokerGame: PokerGame;
     private _players: {
         [key: string]: IPlayer
     } = {};
     private log: GameLog = new GameLog();
     private _hasGameEnded = false;
+    private rounds = 0;
+    private startDate = new Date(Date.now());
 
-    constructor(players: IPlayer[]) {
+
+    private bettingIndex = 0;
+    private discardIndex = 0;
+    private showDownIndex = 0;
+    private playAgainIndex = 0;
+
+    constructor(players: IPlayer[], private mongo: IMongoDb) {
+        this._pokerGame = new PokerGame();
         if (players && players.length !== 5) {
             throw new Error("must have 5 players in order to play.");
         }
-
-        let playerNames = _.map(players, (player) => {
-            return player.getName();
-        });
-        this._gameState = new GameState(playerNames);
 
         this._players = {};
         _.forEach(players, (player) => {
@@ -35,8 +39,27 @@ export class Dealer {
     }
 
     public play(): void {
+        this.bettingIndex = 0;
+        this.discardIndex = 0;
+        this.showDownIndex = 0;
+
         this.log = new GameLog();
-        this._gameState.dealPlayers();
+
+        let temp = new PokerGame();
+        _.forOwn(this._players, (player, name) => {
+            let info = this._pokerGame.info(name)
+            let result;
+            if (info) {
+                result = temp.dealPlayers(name, info.wallet);
+            } else {
+                result = temp.dealPlayers(name, new PokerChip(START_MONEY));
+            }
+            let playerInfo = temp.getPlayerInfo(name);
+            player.dealCards(result.hand, playerInfo);
+        })
+
+        this._pokerGame = temp;
+        this.rounds++;
         this.firstRound();
     }
 
@@ -45,189 +68,224 @@ export class Dealer {
     }
 
     private firstRound() {
-        let playerName = this._gameState.getNextPlayer();
+        let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
 
-        if (this._gameState.isGameOver()) {
+        if (this._pokerGame.isGameOver()) {
             this.endRound();
             return;
         }
-        if (!player) {
-            this._gameState.resetTurn();
+        if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
+            this.bettingIndex = 0;
             this.secondRound();
             return;
         }
 
-        let playerGame = this._gameState.getPlayerGame(playerName);
-        player.dealCards(playerGame.hand);
-
-        player.betting(this.log.getLog()).then((command) => {
-            let result: Info;
-            if (command == CommandType.Fold) {
-                result = this._gameState.fold(playerName);
-            } else if (command == CommandType.Raise) {
-                result = this._gameState.checkAndSetBust(playerName);
-                if (!result) {
-                    result = this._gameState.raise(playerName);
-                }
-            } else if (command == CommandType.See) {
-                result = this._gameState.checkAndSetBust(playerName);
-                if (!result) {
-                    result = this._gameState.see(playerName);
-                } else {
-                    player.gameOver(GameOverState.Bust);
-                    this._gameState.removePlayer(playerName);
-                    _.unset(this._players, playerName);
-                }
-            }
-            this.log.log(result);
-            this.firstRound();
-        }).catch((error) => {
-            console.log(error);
-        });
+        let playerInfo = this._pokerGame.getPlayerInfo(playerName);
+        player.betting(this.log.getLog(), playerInfo)
+            .then((command) => {
+                this._bettingRound(playerName, player, command);
+                this.firstRound();
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
     private secondRound() {
-        let playerName = this._gameState.getNextPlayer(); let player = this._players[playerName];
-        if (this._gameState.isGameOver()) {
+        let playerName = this._pokerGame.getNextPlayer();
+        let player = this._players[playerName];
+
+        if (this._pokerGame.isGameOver()) {
             this.endRound();
             return;
         }
-        if (!player) {
-            this._gameState.resetTurn();
+        if (this.discardIndex == this._pokerGame.getPlayersPlaying().length) {
+            this.discardIndex = 0;
             this.thirdRound();
             return;
         }
-        player.discard(this.log.getLog()).then((command) => {
-            let result: Info;
-            result = this._gameState.discard(playerName, command);
-            this.log.log(result);
 
-            let playerGame = this._gameState.getPlayerGame(playerName);
-            player.dealCards(playerGame.hand);
-
-            this.secondRound();
-        }).catch((error) => {
-            console.log(error);
-        });
+        let playerInfo = this._pokerGame.getPlayerInfo(playerName);
+        player.discard(this.log.getLog(), playerInfo)
+            .then((command) => {
+                this._discardRound(playerName, player, command);
+                this.secondRound();
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
 
     private thirdRound() {
-        let playerName = this._gameState.getNextPlayer();
+        let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
-        if (this._gameState.isGameOver()) {
+
+        if (this._pokerGame.isGameOver()) {
             this.endRound();
             return;
         }
-        if (!player) {
-            this._gameState.resetTurn();
+        if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
+            this.bettingIndex = 0;
             this.showdownRound();
             return;
         }
-        player.betting(this.log.getLog()).then((command) => {
-            let result: Info;
-            if (command == CommandType.Fold) {
-                result = this._gameState.fold(playerName);
-            } else if (command == CommandType.Raise) {
-                result = this._gameState.checkAndSetBust(playerName);
-                if (!result) {
-                    result = this._gameState.raise(playerName);
-                }
-            } else if (command == CommandType.See) {
-                result = this._gameState.checkAndSetBust(playerName);
-                if (!result) {
-                    result = this._gameState.see(playerName);
-                } else {
-                    player.gameOver(GameOverState.Bust);
-                    this._gameState.removePlayer(playerName);
-                    _.unset(this._players, playerName);
-                }
-            }
-            this.log.log(result);
-            this.thirdRound();
-        }).catch((error) => {
-            console.log(error);
-        });
+
+        let playerInfo = this._pokerGame.getPlayerInfo(playerName);
+        player.betting(this.log.getLog(), playerInfo)
+            .then((command) => {
+                this._bettingRound(playerName, player, command);
+                this.thirdRound();
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
     private showdownRound() {
-        let playerName = this._gameState.getNextPlayer();
+        let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
-        if (this._gameState.isGameOver()) {
+
+        if (this._pokerGame.isGameOver()) {
             this.endRound();
             return;
         }
-        if (!player) {
-            this._gameState.resetTurn();
+        if (this.showDownIndex == this._pokerGame.getPlayersPlaying().length) {
+            this.showDownIndex = 0;
             this.endRound();
             return;
         }
-        player.showdown(this.log.getLog()).then((command) => {
-            let result: Info;
-            if (command == EndGameType.Fold) {
-                result = this._gameState.fold(playerName);
-            } else if (command == EndGameType.Show) {
-                result = this._gameState.show(playerName);
-            }
-            this.log.log(result);
-            this.showdownRound();
-        }).catch((error) => {
-            console.log(error);
-        });
+
+        let playerInfo = this._pokerGame.getPlayerInfo(playerName);
+        player.showdown(this.log.getLog(), playerInfo)
+            .then((command) => {
+                this._showDownRound(playerName, player, command);
+                this.showdownRound();
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
     private endRound() {
-        let result = this._gameState.end();
+        let result = this._pokerGame.result();
         _.forEach(result, (elem) => {
             this.log.log(elem);
         });
 
-        if (result.length == 1) {
-            let info = result[0];
-            this._players[info.name].gameOver(GameOverState.Won, info.chipsLeft);
-            this._hasGameEnded = true;
-        }
+        //remove bust players
+        let resulLeft = _.filter(result, (elem) => {
+            if (elem.chipsLeft < START_BET) {
+                this._pokerGame.removePlayer(elem.name);
+                this._players[elem.name].gameOver(GameOverState.Bust, elem.chipsLeft);
+                _.unset(this._players, elem.name);
+                this.save(elem.name, "bust", elem.chipsLeft);
+                return false;
+            }
+            this._pokerGame.setPlaying(elem.name);
+            return true;
+        });
 
-        this.playAgain();
+        if (resulLeft.length == 1) {
+            if (this._hasHumanPlayer()) {
+                _.values(this._players)[0].gameOver(GameOverState.Bust, resulLeft[0].chipsLeft);
+                this.save(_.values(this._players)[0].getName(), "bust", resulLeft[0].chipsLeft);
+            } else {
+                this._hasGameEnded = true;
+            }
+        } else {
+            if (this._hasHumanPlayer()) {
+                this.playAgain(resulLeft);
+            } else {
+                this._hasGameEnded = true;
+            }
+        }
     }
 
-    private playAgain() {
-        let playerName = this._gameState.getNextPlayer();
+    private save(name: string, endType: string, chipsLeft: number) {
+        let gameData: IGameData = {
+            endChips: chipsLeft,
+            endState: endType,
+            endTime: new Date(Date.now()),
+            numberOfRounds: this.rounds,
+            startChips: START_MONEY,
+            startTime: this.startDate,
+            username: name
+        };
+        this.mongo.addGameData(gameData);
+    }
+
+    private playAgain(result: End[]) {
+        let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
-        if (!player) {
-            this._gameState.resetTurn();
+        if (result.length == this.playAgainIndex && this._hasHumanPlayer()) {
+            this.playAgainIndex = 0;
             this.restart();
             return;
         }
-        player.endTurn(this.log.getLog()).then((command) => {
-            let result: Info;
+
+        let playerInfo = this._pokerGame.getPlayerInfo(playerName);
+        player.endTurn(this.log.getLog(), playerInfo).then((command) => {
             if (!command) {
-                this._gameState.removePlayer(playerName);
                 _.unset(this._players, playerName);
+                player.gameOver(GameOverState.Bust, playerInfo.wallet.getValue());
+                this.save(playerName, "folds", playerInfo.wallet.getValue());
             }
-            this.playAgain();
+            this.playAgainIndex++;
+            this.playAgain(result);
         }).catch((error) => {
             console.log(error);
         });
     }
 
     private restart() {
-        let players = this._gameState.getPlayers();
-        if (this._isThereHumanAndMorePlayers()) {
+        if (this._hasHumanPlayer()) {
             this.play();
+        } else {
+            this._hasGameEnded = true;
         }
     }
 
-    private _isThereHumanAndMorePlayers(): boolean {
+    private _bettingRound(playerName: string, player: IPlayer, command: BettingType) {
+        let result: Info;
+        if (command == BettingType.Fold) {
+            result = this._pokerGame.fold(playerName);
+        } else if (command == BettingType.Raise) {
+            result = this._pokerGame.raise(playerName);
+            this.bettingIndex = 1;
+        } else {
+            result = this._pokerGame.see(playerName);
+            this.bettingIndex++;
+        }
+        this.log.log(result);
+    }
+
+    private _discardRound(playerName: string, player: IPlayer, command: number[]) {
+        let result: Info;
+        result = this._pokerGame.discard(playerName, command);
+        this.log.log(result);
+
+        let playerGame = this._pokerGame.info(playerName);
+        this.discardIndex++;
+
+        player.dealCards(playerGame.hand, this._pokerGame.getPlayerInfo(playerName));
+    }
+
+    private _showDownRound(playerName: string, player: IPlayer, command: ShowDownType) {
+        let result: Info;
+        if (command == ShowDownType.Fold) {
+            result = this._pokerGame.fold(playerName);
+        } else if (command == ShowDownType.Show) {
+            result = this._pokerGame.show(playerName);
+        }
+        this.showDownIndex++;
+        this.log.log(result);
+    }
+
+    private _hasHumanPlayer() {
         let yes = false;
-        let playerNames = this._gameState.getPlayers();
-        _.forEach(playerNames, (name) => {
-            let player = this._players[name];
+        _.forOwn(this._players, (player) => {
             if (player instanceof HumanPlayer) {
                 yes = true;
             }
         })
-        return yes && playerNames.length > 1;
+        return yes;
     }
 }

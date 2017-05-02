@@ -1,7 +1,7 @@
-import { CommandType } from './types';
+import { BettingType } from './types';
 
 export interface ICommand {
-    getCommandType(): CommandType;
+    getCommandType(): BettingType;
     getArgument(): number;
 }
 

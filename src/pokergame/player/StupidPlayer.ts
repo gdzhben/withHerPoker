@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 
 import {
-    IPlayer, IHand, CommandType, EndGameType, GameEndState, IGameInfo, GameOverState
+    IPlayer, IHand, BettingType, ShowDownType, GameEndState, IGameInfo, GameOverState
+    , PlayerInfo
 } from '../../interfaces';
 
 export class StupidPlayer implements IPlayer {
@@ -17,23 +18,23 @@ export class StupidPlayer implements IPlayer {
         return this._name;
     }
 
-    public dealCards(hand: IHand): void {
+    public dealCards(hand: IHand, info: PlayerInfo): void {
         this._hand = hand;
     }
 
-    public betting(gameInfo: IGameInfo): Promise<CommandType> {
-        return Promise.resolve(CommandType.See)
+    public betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType> {
+        return Promise.resolve(BettingType.See)
     }
 
-    public discard(gameInfo: IGameInfo): Promise<number[]> {
+    public discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]> {
         return Promise.resolve([0, 1, 2]);
     }
 
-    public showdown(gameInfo: IGameInfo): Promise<EndGameType> {
-        return Promise.resolve(EndGameType.Show);
+    public showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType> {
+        return Promise.resolve(ShowDownType.Show);
     }
 
-    public endTurn(gameInfo: IGameInfo): Promise<boolean> {
+    public endTurn(gameInfo: IGameInfo, info: PlayerInfo): Promise<boolean> {
         return Promise.resolve(true);
     }
 

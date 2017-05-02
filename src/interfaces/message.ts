@@ -24,7 +24,8 @@ export class Message {
         PLAY_AGAIN_COMMAND_ERROR: "Valid commands are yes/y or no/n!",
         WAIT_FOR_SERVER_TO_PROCESS: "Wait for the server to respond!",
         DEAL_ME_ERROR: "Enter dealme to play",
-        DUPLICATE_DISCARD_ERROR: "You cannot enter duplicate indexes!"
+        DUPLICATE_DISCARD_ERROR: "You cannot enter duplicate indexes!",
+        NOT_ENOUGH_CHIPS: "Not enough chips to raise or see!"
     }
 
     public static readonly QUESTION = {

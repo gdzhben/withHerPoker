@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 
-import { IHand, ICard, SIZE_OF_HANDS } from '../../interfaces';
+import {
+    IHand, ICard, SIZE_OF_HANDS, HandType
+} from '../../interfaces';
 import { HandTool } from './HandTool';
 
 export class Hand implements IHand {
@@ -83,11 +85,11 @@ export class Hand implements IHand {
         return _.join(mapped, ', ');
     }
 
-    public getHandType() {
+    public getHandType(): HandType {
         return this.handTool.getHandType(this);
     }
 
-    public getGameValue() {
+    public getGameValue(): number {
         return this.handTool.getGameValue(this);
     }
 }

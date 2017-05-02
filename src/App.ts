@@ -3,7 +3,7 @@ import * as rx from 'rxjs/Rx';
 
 import {
     Message, ITwitterBot,
-    ITwitterStream, IApp
+    ITwitterStream, IApp, IMongoDb
 } from './interfaces'
 import { GamePlay } from './pokergame/game-play/GamePlay'
 import { TwitterBot } from './twitter-bot/TwitterBot';
@@ -16,9 +16,9 @@ export class App implements IApp {
     private directMessageSubscription: rx.Subscription;
     private followSubscription: rx.Subscription;
 
-    constructor(bot: ITwitterBot & IApp & ITwitterStream) {
+    constructor(bot: ITwitterBot & IApp & ITwitterStream, private mongo: IMongoDb) {
         this.bot = bot;
-        this.gamePlay = new GamePlay(this.bot);
+        this.gamePlay = new GamePlay(this.bot, mongo);
     }
 
     public start(): Promise<string> {
