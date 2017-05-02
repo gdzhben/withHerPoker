@@ -74,7 +74,6 @@ export class HumanPlayer implements IPlayer {
         });
     }
 
-
     public gameOver(game: GameOverState, money?: number): void {
         if (game == GameOverState.Bust) {
             this.tools.reply(Message.OTHER.BUST_MESSAGE);

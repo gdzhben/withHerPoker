@@ -60,7 +60,7 @@ export class GamePlay {
     private createPlayers(id: string, name: string): IPlayer[] {
         let arr: IPlayer[];
         arr = _.times(4, (index) => {
-            return PlayerGenerator.createStupidPlayer('XYZ' + index);
+            return PlayerGenerator.createAIPlayer('AI_BOT' + index);
         })
         let tools = {
             observables: this.dealers[id].observable,

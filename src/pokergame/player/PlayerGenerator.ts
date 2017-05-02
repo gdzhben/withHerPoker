@@ -5,7 +5,7 @@ import {
     IPlayer, IUserMessage, ITwitterBot
 } from '../../interfaces';
 import { HumanPlayer } from './HumanPlayer';
-import { StupidPlayer } from './StupidPlayer';
+import { AI } from './AI';
 
 export class PlayerGenerator {
 
@@ -13,7 +13,7 @@ export class PlayerGenerator {
         return new HumanPlayer(name, tools);
     }
 
-    public static createStupidPlayer(name: string): IPlayer {
-        return new StupidPlayer(name);
+    public static createAIPlayer(name: string): IPlayer {
+        return new AI(name, (Math.random() * 9) + 1, (Math.random() * 9) + 1);
     }
 }

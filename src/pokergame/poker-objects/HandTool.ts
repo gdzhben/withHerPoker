@@ -55,7 +55,7 @@ export class HandTool {
                 break;
         }
 
-        let sortedCards = this._getCardsSortedByNoOfSameType(cards);
+        let sortedCards = this.getCardsSortedByNoOfSameType(cards);
         let coefficient = (NO_CARD_TYPES ** (SIZE_OF_HANDS - 1));
         for (let i = 0; i < SIZE_OF_HANDS; i++ , coefficient /= coefficient) {
             let typeValue = sortedCards[i].getFaceValue() - 2;
@@ -70,34 +70,34 @@ export class HandTool {
     }
 
     private _findHandType(cards: ICard[]): HandType {
-        let suitCount = this._createSuitCount(cards);
-        let faceCount = this._createFaceCount(cards);
+        let suitCount = this.createSuitCount(cards);
+        let faceCount = this.createFaceCount(cards);
         let isInOrder = this.isInOrder(cards);
 
-        if (_.hasIn(faceCount, 1)
-            && _.hasIn(faceCount, 10)
-            && _.hasIn(faceCount, 11)
-            && _.hasIn(faceCount, 12)
-            && _.hasIn(faceCount, 13)
-            && _.keysIn(suitCount).length == 1) {
+        if (_.has(faceCount, 14)
+            && _.has(faceCount, 10)
+            && _.has(faceCount, 11)
+            && _.has(faceCount, 12)
+            && _.has(faceCount, 13)
+            && _.keys(suitCount).length == 1) {
             return HandType.RoyalFlush;
         }
 
         if (isInOrder
-            && _.keysIn(suitCount).length == 1) {
+            && _.keys(suitCount).length == 1) {
             return HandType.StraightFlush;
         }
 
-        if (_.includes(_.valuesIn(faceCount), 4)) {
+        if (_.includes(_.values(faceCount), 4)) {
             return HandType.FourOfAKind;
         }
 
-        if (_.includes(_.valuesIn(faceCount), 2)
-            && _.includes(_.valuesIn(faceCount), 3)) {
+        if (_.includes(_.values(faceCount), 2)
+            && _.includes(_.values(faceCount), 3)) {
             return HandType.FullHouse;
         }
 
-        if (_.keysIn(suitCount).length == 1) {
+        if (_.keys(suitCount).length == 1) {
             return HandType.Flush;
         }
 
@@ -105,27 +105,25 @@ export class HandTool {
             return HandType.Straight;
         }
 
-        if (_.includes(_.valuesIn(faceCount), 3)) {
+        if (_.includes(_.values(faceCount), 3)) {
             return HandType.ThreeOfAKind;
         }
 
-        if (_.includes(_.valuesIn(faceCount), 2)
-            && _.keysIn(faceCount).length == 3) {
+        if (_.includes(_.values(faceCount), 2)
+            && _.keys(faceCount).length == 3) {
             return HandType.TwoPairs;
         }
 
-        if (_.includes(_.valuesIn(faceCount), 2)
-            && (_.keysIn(faceCount).length == 4)) {
+        if (_.includes(_.values(faceCount), 2)
+            && (_.keys(faceCount).length == 4)) {
             return HandType.OnePair;
         }
 
         return HandType.HighHand;
     }
 
-
-
-    private _createFaceCount(cards: ICard[]): {
-        [key: string]: number
+    public createFaceCount(cards: ICard[]): {
+        [key: number]: number
     } {
         let faceCount = {};
         _.forEach(cards, (elem) => {
@@ -135,8 +133,7 @@ export class HandTool {
         return faceCount;
     }
 
-
-    private _createSuitCount(cards: ICard[]): {
+    public createSuitCount(cards: ICard[]): {
         [key: number]: number
     } {
         let suitCount = {};
@@ -147,22 +144,33 @@ export class HandTool {
         return suitCount;
     }
 
-
-    private isInOrder(cards: ICard[]): boolean {
+    public isInOrder(cards: ICard[]): boolean {
         for (let i = 0; i < cards.length - 1; i++) {
-            if (cards[i + 1].getFaceValue() != (cards[i].getFaceValue() + 1)) {
+            if (cards[i].getFaceValue() != cards[i + 1].getFaceValue() - 1) {
                 return false;
             }
         }
         return true;
     }
 
-
-    private _getCardsSortedByNoOfSameType(cards: ICard[]): any {
+    public getCardsSortedByNoOfSameType(cards: ICard[]): any {
         let gvCount = {};
-        gvCount = this._createFaceCount(cards);
+        gvCount = this.createFaceCount(cards);
         return _.reverse(_.sortBy(cards, (card) => {
             return gvCount[card.getFaceValue()];
         }));
+    }
+
+    public sort(cards: ICard[]): ICard[] {
+        let sortedCard = _.sortBy(cards, (card) => {
+            return card.getFaceValue();
+        })
+        return sortedCard;
+    }
+
+    public getHighestCard(cards: ICard[]): ICard {
+        return _.maxBy(cards, (card) => {
+            return card.getFaceValue();
+        });
     }
 }

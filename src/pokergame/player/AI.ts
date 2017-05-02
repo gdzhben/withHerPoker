@@ -6,6 +6,7 @@ import {
     HandType, BettingType, ShowDownType, SuitType, IPlayer, IGameInfo, PlayerInfo, GameOverState, IHand
     , RAISE_AMOUNT
 } from '../../interfaces';
+import { HandTool } from '../poker-objects/HandTool';
 
 export class AI implements IPlayer {
     private bluffAbility: number;
@@ -55,7 +56,22 @@ export class AI implements IPlayer {
 
     public discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]> {
         this.myInfo = info;
-        return Promise.resolve([0, 1, 2]);
+        let noOfCardsToBe = Math.floor(Math.random() * 3);
+        let prob = _.times(this.hand.size(), (i) => {
+            return this.getDiscardProbability(i, this.hand);
+        })
+        let indexes: number[] = [];
+
+        _.times(noOfCardsToBe, () => {
+            let number = Math.random();
+            let p = _.max(prob);
+            if (p > number) {
+                let index = _.indexOf(prob, p);
+                prob[index] = -1; //removing that value
+                indexes.push(index);
+            }
+        })
+        return Promise.resolve(indexes);
     }
 
     public showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType> {
@@ -202,5 +218,78 @@ export class AI implements IPlayer {
         }
 
         return rating;
+    }
+
+    private getDiscardProbability(cardIndex: number, hand: IHand): number {
+        const highestFaceValue = 14;
+        const divisor = 12;
+        let handTool = new HandTool();
+        let handType = this.hand.getHandType();
+        let maxCard = handTool.getHighestCard(this.hand.cards());
+        let faceCount = handTool.createFaceCount(this.hand.cards());
+        let card = this.hand.getCard(cardIndex);
+        let cardFaceValue = card.getFaceValue();
+
+        if (handType == HandType.RoyalFlush) {
+            return 0;
+        }
+
+        if (handType == HandType.StraightFlush) {
+            return (highestFaceValue - maxCard.getFaceValue()) / ((cardIndex + 1) * divisor * 4);
+        }
+
+        if (handType == HandType.FourOfAKind) {
+            if (faceCount[cardFaceValue] == 4) {
+                return (highestFaceValue - cardFaceValue) / (divisor * 4);
+            } else {
+                return (highestFaceValue - cardFaceValue) / highestFaceValue;
+            }
+        }
+
+        if (handType == HandType.FullHouse) {
+            if (faceCount[cardFaceValue] == 3) {
+                return (highestFaceValue - cardFaceValue) / (divisor * 3);
+            } else {
+                return (highestFaceValue - cardFaceValue) / highestFaceValue;
+            }
+        }
+
+        if (handType == HandType.Flush) {
+            return (highestFaceValue - cardFaceValue) / (divisor * 2);
+        }
+
+        if (handType == HandType.Straight) {
+            return (highestFaceValue - maxCard.getFaceValue()) / ((cardIndex + 1) * divisor * 2);
+        }
+
+        if (handType == HandType.ThreeOfAKind) {
+            if (faceCount[cardFaceValue] == 3) {
+                return (highestFaceValue - cardFaceValue) / (divisor);
+            } else {
+                return (highestFaceValue - cardFaceValue) / highestFaceValue;
+            }
+        }
+
+        if (handType == HandType.TwoPairs) {
+            if (faceCount[cardFaceValue] == 2) {
+                return (highestFaceValue - cardFaceValue) / (divisor * 2.5);
+            } else {
+                return (highestFaceValue - cardFaceValue) / highestFaceValue;
+            }
+        }
+
+        if (handType == HandType.OnePair) {
+            if (faceCount[cardFaceValue] == 2) {
+                return (highestFaceValue - cardFaceValue) / (divisor * 2);
+            } else {
+                return (highestFaceValue - cardFaceValue) / highestFaceValue;
+            }
+        }
+
+        if (handType == HandType.HighHand) {
+            return (highestFaceValue - cardFaceValue) / (highestFaceValue * (7 - cardIndex));
+        }
+
+        return 1;
     }
 }

@@ -10,6 +10,7 @@ export class Deck implements IDeck {
     constructor(cards: ICard[]) {
         this._deck = _.slice(cards) || [];
         this._discarded = [];
+        this.shuffle();
     }
 
     public shuffle(): void {
