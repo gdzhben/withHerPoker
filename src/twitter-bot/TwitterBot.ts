@@ -105,7 +105,12 @@ export class TwitterBot implements ITwitterBot, ITwitterStream, IApp {
 
     private _createStreams() {
         this._userStream = this._bot.stream(this._userStreamName);
-        this._userStream.on('direct_message', (msg: TwitterMessage) => {
+        this._userStream.on('direct_message', (msg: TwitterMessage, err: any) => {
+            if (err) {
+                let error = new Error(err);
+                this._obsMessage.error(error);
+                return;
+            }
             if (!(_.hasIn(msg, 'direct_message.sender_id_str')
                 && _.hasIn(msg, 'direct_message.sender_screen_name')
                 && _.hasIn(msg, 'direct_message.text'))) {
@@ -124,7 +129,12 @@ export class TwitterBot implements ITwitterBot, ITwitterStream, IApp {
             }
         });
 
-        this._userStream.on('follow', (msg: TwitterFollower) => {
+        this._userStream.on('follow', (msg: TwitterFollower, err: any) => {
+            if (err) {
+                let error = new Error(err);
+                this._obsMessage.error(error);
+                return;
+            }
             if (!(_.hasIn(msg, 'source.id_str')
                 && _.hasIn(msg, 'source.screen_name'))) {
                 let error = new Error('Error in receiving followers');

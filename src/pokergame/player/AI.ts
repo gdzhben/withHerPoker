@@ -16,11 +16,13 @@ export class AI implements IPlayer {
     private gameInfo: any;
     private myInfo: PlayerInfo;
     private hand: IHand;
+    private round: number;
 
     constructor(name: string, bluffAbility: number, riskAversion: number) {
         this.name = name;
         this.bluffAbility = bluffAbility;
         this.riskAversion = riskAversion;
+        this.round = 1;
     }
 
     public getName(): string {
@@ -33,12 +35,14 @@ export class AI implements IPlayer {
     }
 
     public betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType> {
+        this.myInfo = info;
+
         let ratings: number[] = [
-            this.getSeeRating(),
-            this.getRaiseRating(),
+            this.getSeeRating() / this.round,
+            this.getRaiseRating() / ((this.round + 1) ** (2)),
             this.getFoldRating()
         ];
-
+        console.log(ratings);
         let max = 0;
         let outputCommand = BettingType.Fold;
 
@@ -51,11 +55,13 @@ export class AI implements IPlayer {
                 outputCommand = BettingType.Raise;
             }
         }
+        this.round++;
         return Promise.resolve(outputCommand);
     }
 
     public discard(gameInfo: IGameInfo, info: PlayerInfo): Promise<number[]> {
         this.myInfo = info;
+
         let noOfCardsToBe = Math.floor(Math.random() * 3);
         let prob = _.times(this.hand.size(), (i) => {
             return this.getDiscardProbability(i, this.hand);
@@ -76,6 +82,7 @@ export class AI implements IPlayer {
 
     public showdown(gameInfo: IGameInfo, info: PlayerInfo): Promise<ShowDownType> {
         this.myInfo = info;
+
         let command: ShowDownType;
         if (this.hand.getHandType() > 7) {
             command = ShowDownType.Fold;

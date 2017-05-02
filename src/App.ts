@@ -46,6 +46,8 @@ export class App implements IApp {
 
             this.bot.createFriendship(user.id).then(() => {
                 console.log('User followed!');
+            }).catch((error: Error) => {
+                console.log(error);
             });
 
             this.bot.sendDirectMessage(user.id, Message.WELCOME_MESSAGE).then(() => {
@@ -54,6 +56,8 @@ export class App implements IApp {
                         console.log('Welcome Message sent!');
                     })
                 })
+            }).catch((error: Error) => {
+                console.log(error);
             });
         }).add((error: Error) => {
             console.log(error);
