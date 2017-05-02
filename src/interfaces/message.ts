@@ -39,6 +39,8 @@ export class Message {
         BUST_MESSAGE: "Sorry you are BUST! Game Over!" + "\n" +
         "To restart the game, enter dealme",
         WON_MESSAGE: "Congratulations! You won the game!" + "\n" +
+        "To restart the game, enter dealme",
+        QUIT_MESSAGE: "Thanks for playing!" + "\n" +
         "To restart the game, enter dealme"
     }
 

@@ -75,17 +75,17 @@ export class Dealer {
             this.endRound();
             return;
         }
-        if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
-            this.bettingIndex = 0;
-            this.secondRound();
-            return;
-        }
-
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.betting(this.log.getLog(), playerInfo)
             .then((command) => {
                 this._bettingRound(playerName, player, command);
-                this.firstRound();
+
+                if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
+                    this.bettingIndex = 0;
+                    this.secondRound();
+                } else {
+                    this.firstRound();
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -99,17 +99,18 @@ export class Dealer {
             this.endRound();
             return;
         }
-        if (this.discardIndex == this._pokerGame.getPlayersPlaying().length) {
-            this.discardIndex = 0;
-            this.thirdRound();
-            return;
-        }
-
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.discard(this.log.getLog(), playerInfo)
             .then((command) => {
                 this._discardRound(playerName, player, command);
-                this.secondRound();
+
+                if (this.discardIndex == this._pokerGame.getPlayersPlaying().length) {
+                    this.discardIndex = 0;
+                    this.thirdRound();
+                    return;
+                } else {
+                    this.secondRound();
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -124,17 +125,18 @@ export class Dealer {
             this.endRound();
             return;
         }
-        if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
-            this.bettingIndex = 0;
-            this.showdownRound();
-            return;
-        }
-
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.betting(this.log.getLog(), playerInfo)
             .then((command) => {
                 this._bettingRound(playerName, player, command);
-                this.thirdRound();
+
+                if (this.bettingIndex == this._pokerGame.getPlayersPlaying().length) {
+                    this.bettingIndex = 0;
+                    this.showdownRound();
+                    return;
+                } else {
+                    this.thirdRound();
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -148,17 +150,18 @@ export class Dealer {
             this.endRound();
             return;
         }
-        if (this.showDownIndex == this._pokerGame.getPlayersPlaying().length) {
-            this.showDownIndex = 0;
-            this.endRound();
-            return;
-        }
 
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.showdown(this.log.getLog(), playerInfo)
             .then((command) => {
                 this._showDownRound(playerName, player, command);
-                this.showdownRound();
+
+                if (this.showDownIndex == this._pokerGame.getPlayersPlaying().length) {
+                    this.showDownIndex = 0;
+                    this.endRound();
+                } else {
+                    this.showdownRound();
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -225,7 +228,7 @@ export class Dealer {
         player.endTurn(this.log.getLog(), playerInfo).then((command) => {
             if (!command) {
                 _.unset(this._players, playerName);
-                player.gameOver(GameOverState.Bust, playerInfo.wallet.getValue());
+                player.gameOver(GameOverState.Quit, playerInfo.wallet.getValue());
                 this.save(playerName, "folds", playerInfo.wallet.getValue());
             }
             this.playAgainIndex++;

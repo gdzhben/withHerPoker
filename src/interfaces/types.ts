@@ -43,5 +43,6 @@ export enum GameEndState {
 
 export enum GameOverState {
     Won = 1,
-    Bust
+    Bust,
+    Quit
 }
