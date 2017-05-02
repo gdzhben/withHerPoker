@@ -80,7 +80,7 @@ export class Hand implements IHand {
         let mapped = _.map(this._cards, (elem) => {
             return elem.toString();
         });
-        return _.join(mapped, ', ');
+        return `${HandType[this.getHandType()]}:\n${_.join(mapped, ', ')}`;
     }
 
     public getHandType(): HandType {

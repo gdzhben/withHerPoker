@@ -42,6 +42,7 @@ export class Dealer {
         this.bettingIndex = 0;
         this.discardIndex = 0;
         this.showDownIndex = 0;
+        this.playAgainIndex = 0;
 
         this.log = new GameLog();
 
@@ -218,11 +219,6 @@ export class Dealer {
     private playAgain(result: End[]) {
         let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
-        if (result.length == this.playAgainIndex && this._hasHumanPlayer()) {
-            this.playAgainIndex = 0;
-            this.restart();
-            return;
-        }
 
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.endTurn(this.log.getLog(), playerInfo).then((command) => {
@@ -231,6 +227,13 @@ export class Dealer {
                 player.gameOver(GameOverState.Quit, playerInfo.wallet.getValue());
                 this.save(playerName, "folds", playerInfo.wallet.getValue());
             }
+
+            if (result.length == this.playAgainIndex) {
+                this.playAgainIndex = 0;
+                this.restart();
+                return;
+            }
+
             this.playAgainIndex++;
             this.playAgain(result);
         }).catch((error) => {
