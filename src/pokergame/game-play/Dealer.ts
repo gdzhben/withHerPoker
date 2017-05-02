@@ -220,18 +220,18 @@ export class Dealer {
         let playerName = this._pokerGame.getNextPlayer();
         let player = this._players[playerName];
 
+        if (result.length == this.playAgainIndex) {
+            this.playAgainIndex = 0;
+            this.restart();
+            return;
+        }
+
         let playerInfo = this._pokerGame.getPlayerInfo(playerName);
         player.endTurn(this.log.getLog(), playerInfo).then((command) => {
             if (!command) {
                 _.unset(this._players, playerName);
                 player.gameOver(GameOverState.Quit, playerInfo.wallet.getValue());
                 this.save(playerName, "folds", playerInfo.wallet.getValue());
-            }
-
-            if (result.length == this.playAgainIndex) {
-                this.playAgainIndex = 0;
-                this.restart();
-                return;
             }
 
             this.playAgainIndex++;

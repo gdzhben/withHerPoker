@@ -4,7 +4,7 @@ import * as rx from 'rxjs/Rx';
 
 import {
     HandType, BettingType, ShowDownType, SuitType, IPlayer, IGameInfo, PlayerInfo, GameOverState, IHand
-    , RAISE_AMOUNT
+    , RAISE_AMOUNT, START_BET
 } from '../../interfaces';
 import { HandTool } from '../poker-objects/HandTool';
 
@@ -32,6 +32,10 @@ export class AI implements IPlayer {
     public dealCards(hand: IHand, info: PlayerInfo): void {
         this.hand = hand;
         this.myInfo = info;
+        
+        if (info.currentBet.getValue() == START_BET) {
+            this.round = 0;
+        }
     }
 
     public betting(gameInfo: IGameInfo, info: PlayerInfo): Promise<BettingType> {
@@ -42,7 +46,6 @@ export class AI implements IPlayer {
             this.getRaiseRating() / ((this.round + 1) ** (2)),
             this.getFoldRating()
         ];
-        console.log(ratings);
         let max = 0;
         let outputCommand = BettingType.Fold;
 

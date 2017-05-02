@@ -24,17 +24,17 @@ export class GamePlay {
         if (!dealer && _.toLower(user.text) === "dealme") {
             if (_.keys(this.dealers).length > 100) {
                 this.twitterBot.sendDirectMessage(user.id, "Game Buffer Full! Try again later!");
-                return;
-            }
-            this.dealers[user.id] = {
-                observable: new rx.Subject<string>(),
-                dealer: undefined
-            };
-            dealer = this.dealers[user.id];
+            } else {
+                this.dealers[user.id] = {
+                    observable: new rx.Subject<string>(),
+                    dealer: undefined
+                };
+                dealer = this.dealers[user.id];
 
-            let players = this.createPlayers(user.id, user.screenName);
-            dealer.dealer = new Dealer(players, this.mongo);
-            dealer.dealer.play();
+                let players = this.createPlayers(user.id, user.screenName);
+                dealer.dealer = new Dealer(players, this.mongo);
+                dealer.dealer.play();
+            }
         } else if (!dealer && _.toLower(user.text) !== "dealme") {
             this.twitterBot.sendDirectMessage(user.id, Message.ERRORS.DEAL_ME_ERROR);
         } else {
