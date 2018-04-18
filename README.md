@@ -1,6 +1,5 @@
 # withHerPoker
 Twitter-based implementation of five card draw Poker.
-[http://138.68.182.187:3000/](http://138.68.182.187:3000/) <- leaderboard
 
 ## Installing Prerequisites
 1. [NodeJs v7.8.0](https://nodejs.org/en/) 
